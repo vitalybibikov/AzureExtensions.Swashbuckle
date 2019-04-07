@@ -58,3 +58,24 @@ public static class SwaggerController
 4. Open Swagger UI URL in your browser.
 
 If you does not changed api route prefix. Swagger UI URL is https://hostname/api/swagger/ui .
+
+## Options
+
+### Include Xml document file
+
+AzureFunctions.Extensions.Swashbuckle can include xml document file.
+
+1. Change your functions project's GenerateDocumentationFile option to enable.
+
+2. Add configration setting this extensions on your functions project's hots.json
+
+```json
+{
+  "version": "2.0",
+  "extensions": {
+    "Swashbuckle": {
+      "XmlPath":  "{your document xml file name}" 
+    } 
+  }
+}
+```
