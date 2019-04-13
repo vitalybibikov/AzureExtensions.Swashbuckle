@@ -4,6 +4,10 @@ Swagger tooling for API's built with Azure Functions.
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using Swashbuckle.AspNetCore.
 
+# Sample
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/sample
+
 # Getting Started
 
 1. Install the standard Nuget package into your Azure Functions application.
