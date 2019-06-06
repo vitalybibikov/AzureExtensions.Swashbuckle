@@ -38,7 +38,7 @@ namespace TestFunction
         /// <returns>指定されたテスト</returns>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [FunctionName("TestGet")]
-        public Task<IActionResult> Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test/{id}")]
+        public Task<IActionResult> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "test/{id}")]
             HttpRequest request, int id)
         {
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));

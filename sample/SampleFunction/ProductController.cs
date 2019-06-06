@@ -12,6 +12,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 
+
 namespace SampleFunction
 {
     public class ProductController

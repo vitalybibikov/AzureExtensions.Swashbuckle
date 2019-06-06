@@ -5,6 +5,7 @@
 
         public string Title { get; set; } = "AzureFunctions.Extensions.Swashbuckle";
         public string XmlPath { get; set; }
+        public bool AddCodeParamater { get; set; } = true;
 
         public OptionDocument[] Documents { get; set; } = new OptionDocument[]
         {

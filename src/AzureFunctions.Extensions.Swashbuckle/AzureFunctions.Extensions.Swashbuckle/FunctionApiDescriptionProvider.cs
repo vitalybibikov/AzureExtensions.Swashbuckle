@@ -22,6 +22,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
     {
         private readonly IModelMetadataProvider _modelMetadataProvider;
         private readonly IOutputFormatter _outputFormatter;
+        private readonly Option _option;
 
         public FunctionApiDescriptionProvider(
             IOptions<Option> functionsOptions,
@@ -30,6 +31,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             IOutputFormatter outputFormatter, 
             IOptions<HttpOptions> httOptions)
         {
+            _option = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _outputFormatter = outputFormatter;
 
@@ -52,7 +54,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var verbs = triggerAttribute.Methods ??
                             new[] { "get", "post", "delete", "head", "patch", "put", "options" };
 
-                var items = verbs.Select(verb => CreateDescription(methodInfo, route, functionAttr, verb)).ToArray();                
+                var items = verbs.Select(verb => CreateDescription(methodInfo, route, functionAttr, verb, triggerAttribute.AuthLevel)).ToArray();                
                 var group = new ApiDescriptionGroup(functionAttr.Name, items);
                 apiDescrGroup.Add(group);
             }
@@ -79,7 +81,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route,
             FunctionNameAttribute functionAttr,
-            string verb)
+            string verb, AuthorizationLevel authorizationLevel)
         {
             var controlleName = methodInfo.DeclaringType.Name.EndsWith("Controller")
                 ? methodInfo.DeclaringType.Name.Remove(
@@ -125,6 +127,21 @@ namespace AzureFunctions.Extensions.Swashbuckle
             foreach (var apiResponseType in GetResponseTypes(methodInfo))
             {
                 description.SupportedResponseTypes.Add(apiResponseType);
+            }
+
+            
+            if (_option.AddCodeParamater && authorizationLevel != AuthorizationLevel.Anonymous)
+            {
+                description.ParameterDescriptions.Add(new ApiParameterDescription
+                {
+                    Name = "code",
+                    Type = typeof(string),
+                    Source = BindingSource.Query,
+                    RouteInfo = new ApiParameterRouteInfo
+                    {
+                        IsOptional = true
+                    }
+                });
             }
 
             return description;
