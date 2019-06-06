@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -23,6 +24,7 @@ namespace TestFunction
         /// <returns>すべてのテスト</returns>
         [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
         [FunctionName("TestGets")]
+        [QueryStringParamater("expand", "it is expand parameter", DataType = typeof(int))]
         public async Task<IActionResult> Gets([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")] HttpRequest request)
         {
             return new OkObjectResult(new[] {new TestModel(), new TestModel(),});

@@ -123,6 +123,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     options.IncludeXmlComments(_xmlPath);
                 }
                 options.OperationFilter<FunctionsOperationFilter>();
+                options.OperationFilter<QueryStringParameterAttributeFilter>();
             });            
 
             _serviceProvider = services.BuildServiceProvider(true);
