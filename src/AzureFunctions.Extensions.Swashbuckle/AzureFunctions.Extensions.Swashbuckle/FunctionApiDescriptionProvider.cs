@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,12 +53,34 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix) ? "" : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 var route =
                     $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+
+                var routes = new List<string>();
+                
+                var regex = new Regex("/\\{\\w+\\?\\}$");
+                var match = regex.Match(route);
+
+                if(match.Success && match.Captures.Count == 1)
+                {
+                    routes.Add(route.Replace(match.Value, "").Replace("//", "/"));
+                    routes.Add(route.Replace(match.Value, match.Value.Replace("?", "")));
+                }
+                else
+                {
+                    routes.Add(route);
+                }
                 var verbs = triggerAttribute.Methods ??
                             new[] { "get", "post", "delete", "head", "patch", "put", "options" };
 
-                var items = verbs.Select(verb => CreateDescription(methodInfo, route, functionAttr, verb, triggerAttribute.AuthLevel)).ToArray();                
-                var group = new ApiDescriptionGroup(functionAttr.Name, items);
-                apiDescrGroup.Add(group);
+
+                for (var index = 0; index < routes.Count; index++)
+                {
+                    var r = routes[index];
+                    var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
+                    var items = verbs.Select(verb =>
+                        CreateDescription(methodInfo, r, functionAttr, verb, triggerAttribute.AuthLevel)).ToArray();
+                    var group = new ApiDescriptionGroup(apiName, items);
+                    apiDescrGroup.Add(@group);
+                }
             }
 
             ApiDescriptionGroups =
@@ -119,7 +143,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 description.ActionDescriptor.Parameters.Add(new ParameterDescriptor
                 {
                     Name = parameter.Name,
-                    ParameterType = parameter.Type
+                    ParameterType = parameter.Type,
                 });
                 description.ParameterDescriptions.Add(parameter);
             }
@@ -181,6 +205,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return triggerAttribute;
         }
 
+        private static Regex GetRoutePathParamRegex(string parameterName)
+        {
+            return new Regex("\\{[" + parameterName + "]+[\\?]{0,1}\\}");
+        }
+
         private IEnumerable<ApiParameterDescription> GetParametersDescription(MethodInfo methodInfo, string route)
         {
             foreach (var parameter in methodInfo.GetParameters())
@@ -203,9 +232,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     ? requestBodyTypeAttribute.Type
                     : parameter.ParameterType;
 
-                var bindingSource = route.Contains("{" + parameter.Name) ? BindingSource.Path
+                var regex = GetRoutePathParamRegex(parameter.Name);
+                var match = regex.Match(route);
+                var bindingSource = match.Success ? BindingSource.Path
                     : hasFromUriAttribute ? BindingSource.Query
                     : BindingSource.Body;
+
+                bool optional = bindingSource == BindingSource.Query || match.Value.Contains("?");
 
                 yield return new ApiParameterDescription
                 {
@@ -214,7 +247,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     Source = bindingSource,
                     RouteInfo = new ApiParameterRouteInfo
                     {
-                        IsOptional = bindingSource == BindingSource.Query
+                        IsOptional = optional,
                     }
                 };
             }

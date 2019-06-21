@@ -45,6 +45,20 @@ namespace TestFunction
         }
 
         /// <summary>
+        /// テストの取得
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="id">テストId</param>
+        /// <returns>指定されたテスト</returns>
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
+        [FunctionName("TestGetCat")]
+        public Task<IActionResult> GetCat([HttpTrigger(AuthorizationLevel.Function, "get", Route = "cat/{id}/{testId?}")]
+            HttpRequest request, int id, int? testId)
+        {
+            return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
+        }
+
+        /// <summary>
         /// テストの追加
         /// </summary>
         /// <param name="testModel">テストモデル</param>
