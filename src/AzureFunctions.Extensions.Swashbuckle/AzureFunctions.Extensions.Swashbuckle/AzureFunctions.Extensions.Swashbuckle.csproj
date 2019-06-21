@@ -8,7 +8,7 @@
     <Product />
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>yuka1984</Copyright>
     <PackageProjectUrl>https://github.com/yuka1984/azure-functions-extensions-swashbuckle</PackageProjectUrl>

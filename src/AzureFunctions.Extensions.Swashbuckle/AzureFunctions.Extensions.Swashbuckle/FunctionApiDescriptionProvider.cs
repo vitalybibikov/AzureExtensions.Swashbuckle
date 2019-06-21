@@ -54,19 +54,19 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var route =
                     $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
 
-                var routes = new List<string>();
+                var routes = new List<(string Route, string RemoveParamName)>();
                 
-                var regex = new Regex("/\\{\\w+\\?\\}$");
+                var regex = new Regex("/\\{(?<paramName>\\w+)\\?\\}$");
                 var match = regex.Match(route);
 
                 if(match.Success && match.Captures.Count == 1)
                 {
-                    routes.Add(route.Replace(match.Value, "").Replace("//", "/"));
-                    routes.Add(route.Replace(match.Value, match.Value.Replace("?", "")));
+                    routes.Add((route.Replace(match.Value, "").Replace("//", "/"), match.Groups["paramName"].ToString()));
+                    routes.Add((route.Replace(match.Value, match.Value.Replace("?", "")), ""));
                 }
                 else
                 {
-                    routes.Add(route);
+                    routes.Add((route, ""));
                 }
                 var verbs = triggerAttribute.Methods ??
                             new[] { "get", "post", "delete", "head", "patch", "put", "options" };
@@ -77,7 +77,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     var r = routes[index];
                     var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
                     var items = verbs.Select(verb =>
-                        CreateDescription(methodInfo, r, functionAttr, verb, triggerAttribute.AuthLevel)).ToArray();
+                        CreateDescription(methodInfo, r.Route, functionAttr, verb, triggerAttribute.AuthLevel, r.RemoveParamName)).ToArray();
                     var group = new ApiDescriptionGroup(apiName, items);
                     apiDescrGroup.Add(@group);
                 }
@@ -105,7 +105,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route,
             FunctionNameAttribute functionAttr,
-            string verb, AuthorizationLevel authorizationLevel)
+            string verb, AuthorizationLevel authorizationLevel, string removeParamName = null)
         {
             var controlleName = methodInfo.DeclaringType.Name.EndsWith("Controller")
                 ? methodInfo.DeclaringType.Name.Remove(
@@ -140,6 +140,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var parameters = GetParametersDescription(methodInfo, route).ToList();
             foreach (var parameter in parameters)
             {
+                if (parameter.Name == removeParamName)
+                {
+                    continue;
+                }
                 description.ActionDescriptor.Parameters.Add(new ParameterDescriptor
                 {
                     Name = parameter.Name,
