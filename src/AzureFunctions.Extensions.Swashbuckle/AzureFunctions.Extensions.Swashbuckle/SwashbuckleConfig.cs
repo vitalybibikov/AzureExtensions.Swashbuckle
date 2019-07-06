@@ -130,10 +130,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         }
 
-        public Stream GetSwaggerDocument()
+        public Stream GetSwaggerDocument(string documentName)
         {
             var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
-            var swaggerDocument = requiredService.GetSwagger("v1");
+            var swaggerDocument = requiredService.GetSwagger(documentName);
             var mem = new MemoryStream();
             var streamWriter = new StreamWriter(mem);
             var mvcOptionsAccessor =

@@ -8,9 +8,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
     public static class SwashBuckleClientExtension
     {
         public static HttpResponseMessage CreateSwaggerDocumentResponse(this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage)
+            HttpRequestMessage requestMessage, string documentName)
         {
-            var stream = client.GetSwaggerDocument();
+            var stream = client.GetSwaggerDocument(documentName);
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
