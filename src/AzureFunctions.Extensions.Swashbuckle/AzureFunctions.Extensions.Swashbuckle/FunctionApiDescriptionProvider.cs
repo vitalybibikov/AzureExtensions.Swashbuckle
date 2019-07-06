@@ -42,7 +42,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Any())
                 .ToArray();
 
-            IList<ApiDescriptionGroup> apiDescrGroup = new List<ApiDescriptionGroup>();
+            var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             foreach (var methodInfo in methods)
             {
                 if (!TryGetHttpTrigger(methodInfo, out var triggerAttribute))
@@ -50,6 +50,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
                 var functionAttr =
                     (FunctionNameAttribute)methodInfo.GetCustomAttribute(typeof(FunctionNameAttribute), false);
+                var apiExplorerSettingsAttribute = 
+                    (ApiExplorerSettingsAttribute)methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false);
                 var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix) ? "" : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 var route =
                     $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
@@ -77,14 +79,24 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     var r = routes[index];
                     var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
                     var items = verbs.Select(verb =>
-                        CreateDescription(methodInfo, r.Route, functionAttr, verb, triggerAttribute.AuthLevel, r.RemoveParamName)).ToArray();
-                    var group = new ApiDescriptionGroup(apiName, items);
-                    apiDescrGroup.Add(@group);
+                        CreateDescription(methodInfo, r.Route, functionAttr, apiExplorerSettingsAttribute, verb, triggerAttribute.AuthLevel, r.RemoveParamName)).ToArray();
+
+                    string groupName = 
+                        (items.FirstOrDefault()?.ActionDescriptor as ControllerActionDescriptor)?.ControllerName ?? apiName;
+                    if (!apiDescGroups.ContainsKey(groupName))
+                    {
+                        apiDescGroups[groupName] = new List<ApiDescription>();
+                    }
+
+                    apiDescGroups[groupName].AddRange(items);
                 }
             }
 
             ApiDescriptionGroups =
-                new ApiDescriptionGroupCollection(new ReadOnlyCollection<ApiDescriptionGroup>(apiDescrGroup), 1);
+                new ApiDescriptionGroupCollection(
+                    new ReadOnlyCollection<ApiDescriptionGroup>(
+                        apiDescGroups.Select(kv => new ApiDescriptionGroup(kv.Key, kv.Value)).ToList()
+                ), 1);
         }
 
         public ApiDescriptionGroupCollection ApiDescriptionGroups { get; }
@@ -104,13 +116,22 @@ namespace AzureFunctions.Extensions.Swashbuckle
         }
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route,
-            FunctionNameAttribute functionAttr,
+            FunctionNameAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
             string verb, AuthorizationLevel authorizationLevel, string removeParamName = null)
         {
-            var controlleName = methodInfo.DeclaringType.Name.EndsWith("Controller")
-                ? methodInfo.DeclaringType.Name.Remove(
-                    methodInfo.DeclaringType.Name.Length - "Controller".Length, "Controller".Length)
-                : functionAttr.Name;
+            string controllerName;
+            if (apiExplorerSettingsAttr?.GroupName != null)
+            {
+                controllerName = apiExplorerSettingsAttr.GroupName;
+            }
+            else
+            {
+                controllerName = methodInfo.DeclaringType.Name.EndsWith("Controller")
+                    ? methodInfo.DeclaringType.Name.Remove(
+                        methodInfo.DeclaringType.Name.Length - "Controller".Length, "Controller".Length)
+                    : functionAttr.Name;
+            }
+
             var actionName = functionAttr.Name;
 
             var description = new ApiDescription
@@ -118,13 +139,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 ActionDescriptor = new ControllerActionDescriptor
                 {
                     MethodInfo = methodInfo,
-                    ControllerName = controlleName,
+                    ControllerName = controllerName,
                     DisplayName = actionName,
                     ControllerTypeInfo = methodInfo.DeclaringType.GetTypeInfo(),
                     Parameters = new List<ParameterDescriptor>(),
                     RouteValues = new Dictionary<string, string>()
                     {
-                        {"controller",controlleName },
+                        {"controller", controllerName },
                         {"action", actionName }
                     }
                 },
