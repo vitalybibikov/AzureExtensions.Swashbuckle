@@ -51,7 +51,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var functionAttr =
                     (FunctionNameAttribute)methodInfo.GetCustomAttribute(typeof(FunctionNameAttribute), false);
                 var apiExplorerSettingsAttribute = 
-                    (ApiExplorerSettingsAttribute)methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false);
+                    (ApiExplorerSettingsAttribute)methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false) ??
+                    (ApiExplorerSettingsAttribute)methodInfo.DeclaringType.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false);
+
                 var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix) ? "" : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 var route =
                     $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
