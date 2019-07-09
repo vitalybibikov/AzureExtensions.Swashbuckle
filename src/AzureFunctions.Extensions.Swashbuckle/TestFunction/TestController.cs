@@ -15,6 +15,7 @@ namespace TestFunction
     /// <summary>
     /// テストコントローラ
     /// </summary>
+    [ApiExplorerSettings(GroupName = "testee")]
     public class TestController
     {
         /// <summary>
