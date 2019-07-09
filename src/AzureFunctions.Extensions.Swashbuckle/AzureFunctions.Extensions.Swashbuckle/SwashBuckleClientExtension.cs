@@ -8,9 +8,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
     public static class SwashBuckleClientExtension
     {
         public static HttpResponseMessage CreateSwaggerDocumentResponse(this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage)
+            HttpRequestMessage requestMessage, string documentName = "v1")
         {
-            var stream = client.GetSwaggerDocument();
+            var stream = client.GetSwaggerDocument(documentName);
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
@@ -24,9 +24,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public static HttpResponseMessage CreateSwaggerUIResponse(this ISwashBuckleClient client,
             HttpRequestMessage requestMessage, string documentRoute)
         {
+            string routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
+                ? string.Empty
+                : $"/{client.RoutePrefix}";
+
             var stream =
                 client.GetSwaggerUi(
-                    $"{requestMessage.RequestUri.Scheme}://{requestMessage.RequestUri.Authority}/{client.RoutePrefix}/{documentRoute}");
+                    $"{requestMessage.RequestUri.Scheme}://{requestMessage.RequestUri.Authority.TrimEnd('/')}{routePrefix}/{documentRoute}");
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
             var result = new HttpResponseMessage(HttpStatusCode.OK);
