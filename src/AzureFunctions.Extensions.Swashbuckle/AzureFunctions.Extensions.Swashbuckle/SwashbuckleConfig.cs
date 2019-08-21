@@ -14,6 +14,7 @@ using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
@@ -106,14 +107,17 @@ namespace AzureFunctions.Extensions.Swashbuckle
             services.AddSingleton<IApiDescriptionGroupCollectionProvider>(_apiDescriptionGroupCollectionProvider);
             services.AddSwaggerGen(options =>
             {
-                foreach (var optionDocument in _option.Documents)
+                if (_option.Documents.Length == 0)
                 {
-                    options.SwaggerDoc(optionDocument.Name, new Info
+                    var defaultDocument = new OptionDocument();
+                    AddSwaggerDocument(options, defaultDocument);
+                }
+                else
+                {
+                    foreach (var optionDocument in _option.Documents)
                     {
-                        Title = optionDocument.Title,
-                        Version = optionDocument.Version,
-                        Description = optionDocument.Description
-                    });
+                        AddSwaggerDocument(options, optionDocument);
+                    }
                 }
                 
                 options.DescribeAllEnumsAsStrings();
@@ -148,6 +152,16 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public Task<HttpResponseMessage> ConvertAsync(HttpRequestMessage input, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        private static void AddSwaggerDocument(SwaggerGenOptions options, OptionDocument document)
+        {
+            options.SwaggerDoc(document.Name, new Info
+            {
+                Title = document.Title,
+                Version = document.Version,
+                Description = document.Description,
+            });
         }
     }
 }
