@@ -4,7 +4,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 {
     public interface ISwashBuckleClient
     {
-        Stream GetSwaggerDocument(string documentName = "v1");
+        Stream GetSwaggerDocument(string documentName = "v1", string host = null);
 
         Stream GetSwaggerUi(string swaggerUrl);
 
