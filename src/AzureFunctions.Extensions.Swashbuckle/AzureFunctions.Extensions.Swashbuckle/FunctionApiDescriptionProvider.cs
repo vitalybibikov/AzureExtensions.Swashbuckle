@@ -58,11 +58,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 string route;
                 if (_option.PrepandOperationWithRoutePrefix)
                 {
-                    route = !string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name;
+                    route = $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
                 }
                 else
                 {
-                    route = $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+                    route = !string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name;
                 }
 
                 var routes = new List<(string Route, string RemoveParamName)>();
