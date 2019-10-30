@@ -69,8 +69,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
 
         public SwashbuckleConfig(
-            IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider, 
-            IOptions<Option> functionsOptions, 
+            IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
+            IOptions<Option> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IOptions<HttpOptions> httpOptions)
         {
@@ -119,16 +119,16 @@ namespace AzureFunctions.Extensions.Swashbuckle
                         AddSwaggerDocument(options, optionDocument);
                     }
                 }
-                
+
                 options.DescribeAllEnumsAsStrings();
 
-                if(!string.IsNullOrWhiteSpace(_xmlPath))
+                if (!string.IsNullOrWhiteSpace(_xmlPath))
                 {
                     options.IncludeXmlComments(_xmlPath);
                 }
                 options.OperationFilter<FunctionsOperationFilter>();
                 options.OperationFilter<QueryStringParameterAttributeFilter>();
-            });            
+            });
 
             _serviceProvider = services.BuildServiceProvider(true);
 
@@ -137,11 +137,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public Stream GetSwaggerDocument(string documentName = "v1")
         {
             var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
-            string basePath = null;
-            if (_option.FillSwaggerBasePathWithRoutePrefix)
-            {
-                basePath = RoutePrefix;
-            }
+            string basePath = _option.FillSwaggerBasePathWithRoutePrefix ? $"/{RoutePrefix}" : null;
             var swaggerDocument = requiredService.GetSwagger(documentName, basePath: basePath);
             var mem = new MemoryStream();
             var streamWriter = new StreamWriter(mem);
