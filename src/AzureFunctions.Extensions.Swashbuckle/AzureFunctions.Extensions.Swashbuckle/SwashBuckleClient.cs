@@ -11,9 +11,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
             _config = config;
         }
 
-        public Stream GetSwaggerDocument(string documentName = "v1")
+        public Stream GetSwaggerDocument(string host, string documentName = "v1")
         {
-            return _config.GetSwaggerDocument(documentName);
+            return _config.GetSwaggerDocument(host, documentName);
         }
 
         public Stream GetSwaggerUi(string swaggerUrl)
