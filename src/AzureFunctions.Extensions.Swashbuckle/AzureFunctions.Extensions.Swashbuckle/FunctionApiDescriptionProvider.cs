@@ -29,8 +29,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public FunctionApiDescriptionProvider(
             IOptions<Option> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
-            IModelMetadataProvider modelMetadataProvider, 
-            IOutputFormatter outputFormatter, 
+            IModelMetadataProvider modelMetadataProvider,
+            IOutputFormatter outputFormatter,
             IOptions<HttpOptions> httOptions)
         {
             _option = functionsOptions.Value;
@@ -50,20 +50,27 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
                 var functionAttr =
                     (FunctionNameAttribute)methodInfo.GetCustomAttribute(typeof(FunctionNameAttribute), false);
-                var apiExplorerSettingsAttribute = 
+                var apiExplorerSettingsAttribute =
                     (ApiExplorerSettingsAttribute)methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false) ??
                     (ApiExplorerSettingsAttribute)methodInfo.DeclaringType.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute), false);
 
                 var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix) ? "" : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
-                var route =
-                    $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+                string route;
+                if (_option.PrepandOperationWithRoutePrefix)
+                {
+                    route = $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+                }
+                else
+                {
+                    route = !string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name;
+                }
 
                 var routes = new List<(string Route, string RemoveParamName)>();
-                
+
                 var regex = new Regex("/\\{(?<paramName>\\w+)\\?\\}$");
                 var match = regex.Match(route);
 
-                if(match.Success && match.Captures.Count == 1)
+                if (match.Success && match.Captures.Count == 1)
                 {
                     routes.Add((route.Replace(match.Value, "").Replace("//", "/"), match.Groups["paramName"].ToString()));
                     routes.Add((route.Replace(match.Value, match.Value.Replace("?", "")), ""));
@@ -83,7 +90,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     var items = verbs.Select(verb =>
                         CreateDescription(methodInfo, r.Route, index, functionAttr, apiExplorerSettingsAttribute, verb, triggerAttribute.AuthLevel, r.RemoveParamName, verbs.Length > 1)).ToArray();
 
-                    string groupName = 
+                    string groupName =
                         (items.FirstOrDefault()?.ActionDescriptor as ControllerActionDescriptor)?.ControllerName ?? apiName;
                     if (!apiDescGroups.ContainsKey(groupName))
                     {
@@ -158,7 +165,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             };
 
             var supportedMediaTypes = methodInfo.GetCustomAttributes<SupportedRequestFormatAttribute>()
-                .Select(x => new ApiRequestFormat {MediaType = x.MediaType}).ToList();
+                .Select(x => new ApiRequestFormat { MediaType = x.MediaType }).ToList();
             foreach (var supportedMediaType in supportedMediaTypes)
                 description.SupportedRequestFormats.Add(supportedMediaType);
 
@@ -182,7 +189,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
 
-            
+
             if (_option.AddCodeParamater && authorizationLevel != AuthorizationLevel.Anonymous)
             {
                 description.ParameterDescriptions.Add(new ApiParameterDescription
@@ -291,7 +298,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             if (parameter.ParameterType == typeof(ILogger)) return true;
             if (parameter.ParameterType.IsAssignableFrom(typeof(ILogger))) return true;
             if (parameter.ParameterType.IsAssignableFrom(typeof(ISwashBuckleClient))) return true;
-            if (parameter.GetCustomAttributes().Any(attr =>(attr is HttpTriggerAttribute)) 
+            if (parameter.GetCustomAttributes().Any(attr => (attr is HttpTriggerAttribute))
                 && parameter.GetCustomAttributes().All(attr => !(attr is RequestBodyTypeAttribute))) return true;
             return false;
         }

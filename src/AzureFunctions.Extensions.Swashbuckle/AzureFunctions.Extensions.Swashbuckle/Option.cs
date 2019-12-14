@@ -7,7 +7,11 @@
         public string XmlPath { get; set; }
         public bool AddCodeParamater { get; set; } = true;
 
-        public OptionDocument[] Documents { get; set; } = {};
+        public OptionDocument[] Documents { get; set; } = { };
+
+        public bool PrepandOperationWithRoutePrefix { get; set; } = true;
+
+        public bool FillSwaggerBasePathWithRoutePrefix { get; set; } = false;
     }
 
     public class OptionDocument
