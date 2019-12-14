@@ -88,7 +88,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     var r = routes[index];
                     var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
                     var items = verbs.Select(verb =>
-                        CreateDescription(methodInfo, r.Route, functionAttr, apiExplorerSettingsAttribute, verb, triggerAttribute.AuthLevel, r.RemoveParamName)).ToArray();
+                        CreateDescription(methodInfo, r.Route, index, functionAttr, apiExplorerSettingsAttribute, verb, triggerAttribute.AuthLevel, r.RemoveParamName, verbs.Length > 1)).ToArray();
 
                     string groupName =
                         (items.FirstOrDefault()?.ActionDescriptor as ControllerActionDescriptor)?.ControllerName ?? apiName;
@@ -124,9 +124,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return true;
         }
 
-        private ApiDescription CreateDescription(MethodInfo methodInfo, string route,
+        private ApiDescription CreateDescription(MethodInfo methodInfo, string route, int routeIndex,
             FunctionNameAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
-            string verb, AuthorizationLevel authorizationLevel, string removeParamName = null)
+            string verb, AuthorizationLevel authorizationLevel, string removeParamName = null, bool manyVerbs = false)
         {
             string controllerName;
             if (apiExplorerSettingsAttr?.GroupName != null)
@@ -142,6 +142,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             }
 
             var actionName = functionAttr.Name;
+            var actionNamePrefix = (routeIndex > 0 ? $"_{routeIndex}" : "") + (manyVerbs ? $"_{verb.ToLower()}" : "");
 
             var description = new ApiDescription
             {
@@ -156,7 +157,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     {
                         {"controller", controllerName },
                         {"action", actionName }
-                    }
+                    },
+                    ActionName = !string.IsNullOrEmpty(actionNamePrefix) ? actionName + actionNamePrefix : null,
                 },
                 RelativePath = route,
                 HttpMethod = verb.ToUpper()

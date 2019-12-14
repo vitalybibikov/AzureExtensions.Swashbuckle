@@ -128,6 +128,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 }
                 options.OperationFilter<FunctionsOperationFilter>();
                 options.OperationFilter<QueryStringParameterAttributeFilter>();
+                options.OperationFilter<GenerateOperationIdFilter>();
             });
 
             _serviceProvider = services.BuildServiceProvider(true);
