@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Newtonsoft.Json;
 
 namespace TestFunction
 {
@@ -69,6 +71,28 @@ namespace TestFunction
         public Task<IActionResult> Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test")]TestModel testModel)
         {
             return Task.FromResult<IActionResult>(new CreatedResult("", testModel));
+        }
+
+        /// <summary>
+        /// テストの追加と検証
+        /// </summary>
+        /// <param name="testModel">テストモデル</param>
+        /// <returns>追加結果</returns>
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
+        [FunctionName("TestAddGet")]
+        public async Task<IActionResult> AddAndGet([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "testandget")]HttpRequest httpRequest)
+        {
+            if (httpRequest.Method.ToLower() == "post")
+            {
+                using (var reader = new StreamReader(httpRequest.Body))
+                {
+                    var json = await reader.ReadToEndAsync();
+                    var testModel = JsonConvert.DeserializeObject<TestModel>(json);
+                    return new CreatedResult("", testModel);
+                }
+            }
+
+            return new OkResult();
         }
 
         /// <summary>
