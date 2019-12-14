@@ -14,7 +14,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         {
             var attributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
                 .Union(context.MethodInfo.GetCustomAttributes(true))
-                .OfType<QueryStringParamaterAttribute>();
+                .OfType<QueryStringParameterAttribute>();
 
             foreach (var attribute in attributes)
                 operation.Parameters.Add(new NonBodyParameter
@@ -23,7 +23,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     Description = attribute.Description,
                     In = "query",
                     Required = attribute.Required,
-                    Type = context.SchemaRegistry.GetOrRegister(attribute.DataType).Type
+                    Type = context.SchemaRegistry.GetOrRegister(attribute.DataType ?? typeof(string)).Type
                 });
         }
     }

@@ -5,9 +5,9 @@ using System.Text;
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    public class QueryStringParamaterAttribute : System.Attribute
+    public class QueryStringParameterAttribute : System.Attribute
     {
-        public QueryStringParamaterAttribute(string name, string description)
+        public QueryStringParameterAttribute(string name, string description)
         {
             Name = name;
             Description = description;

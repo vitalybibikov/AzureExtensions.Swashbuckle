@@ -27,7 +27,7 @@ namespace TestFunction
         /// <returns>すべてのテスト</returns>
         [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
         [FunctionName("TestGets")]
-        [QueryStringParamater("expand", "it is expand parameter", DataType = typeof(int))]
+        [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int))]
         public async Task<IActionResult> Gets([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")] HttpRequest request)
         {
             return new OkObjectResult(new[] {new TestModel(), new TestModel(),});
@@ -54,6 +54,7 @@ namespace TestFunction
         /// <param name="id">テストId</param>
         /// <returns>指定されたテスト</returns>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
+        [QueryStringParameter("name", "this is name", DataType = typeof(string), Required = true)]
         [FunctionName("TestGetCat")]
         public Task<IActionResult> GetCat([HttpTrigger(AuthorizationLevel.Function, "get", Route = "cat/{id}/{testId?}")]
             HttpRequest request, int id, int? testId)
@@ -79,6 +80,7 @@ namespace TestFunction
         /// <param name="testModel">テストモデル</param>
         /// <returns>追加結果</returns>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
+        [QueryStringParameter("test", "test", Required = false)]
         [FunctionName("TestAddGet")]
         public async Task<IActionResult> AddAndGet([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "testandget")]HttpRequest httpRequest)
         {
