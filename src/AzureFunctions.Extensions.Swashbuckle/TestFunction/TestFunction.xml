@@ -39,6 +39,13 @@
             <param name="testModel">テストモデル</param>
             <returns>追加結果</returns>
         </member>
+        <member name="M:TestFunction.TestController.AddAndGet(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            テストの追加と検証
+            </summary>
+            <param name="testModel">テストモデル</param>
+            <returns>追加結果</returns>
+        </member>
         <member name="T:TestFunction.TestController.TestModel">
             <summary>
             テストモデル

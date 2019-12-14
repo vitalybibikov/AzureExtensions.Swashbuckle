@@ -2,7 +2,9 @@
   "version": "2.0",
   "extensions": {
     "Swashbuckle": {
-      "XmlPath":  "TestFunction.xml" 
+      "XmlPath": "TestFunction.xml",
+      "PrepandOperationWithRoutePrefix": true,
+      "FillSwaggerBasePathWithRoutePrefix":  true 
     } 
   }
 }
