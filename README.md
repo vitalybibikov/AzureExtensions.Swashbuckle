@@ -6,7 +6,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 # Sample
 
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/sample
+https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle
 
 # Update
 
