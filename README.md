@@ -11,11 +11,13 @@ https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle
 # Update
 
 Version 2.0.1
-Update to Funcctions v3
+Update to Functions v3
+Nuget: https://www.nuget.org/packages/AzureExtensions.Swashbuckle/
+
 
 ```
-Package Manager : Install-Package AzureFunctions.Extensions.Swashbuckle
-CLI : dotnet add package AzureFunctions.Extensions.Swashbuckle
+Package Manager : Install-Package AzureExtensions.Swashbuckle
+CLI : dotnet add package AzureExtensions.Swashbuckle
 ```
 
 2. Add startup class on your Functions project.
