@@ -10,29 +10,8 @@ https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/s
 
 # Update
 
-Version 1.4.4
-
-### bug fix 
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/20
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/13
-
-### breaking changes
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/9
-
-QueryStringParamaterAttribute -> QueryStringParameterAttribute
-
-### features
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/pull/18
-
-Thank you @LockTar
-
-# Getting Started
-
-1. Install the standard Nuget package into your Azure Functions application.
+Version 2.0.1
+Update to Funcctions v3
 
 ```
 Package Manager : Install-Package AzureFunctions.Extensions.Swashbuckle
