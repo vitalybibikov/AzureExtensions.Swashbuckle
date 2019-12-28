@@ -1,48 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>yuka1984</Authors>
-    <Company>sigmact</Company>
-    <Product />
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>AzureExtensions.Swashbuckle</PackageId>
+    <Authors>yuka1984, vitalybibikov</Authors>
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>1.4.4</Version>
+    <Version>2.0.0</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>yuka1984</Copyright>
-    <PackageProjectUrl>https://github.com/yuka1984/azure-functions-extensions-swashbuckle</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/yuka1984/azure-functions-extensions-swashbuckle</RepositoryUrl>
-    <RepositoryType>github</RepositoryType>
+    <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Swagger Swashbuckle AzureFunctions webjobs extensions</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression></PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="EmbededResources\index.html" />
-    <None Remove="EmbededResources\swagger-ui-bundle.js" />
-    <None Remove="EmbededResources\swagger-ui-standalone-preset.js" />
-    <None Remove="EmbededResources\swagger-ui.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="EmbededResources\index.html" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui-bundle.js" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui-standalone-preset.js" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Azure.WebJobs.Extensions.Http">
-      <HintPath>..\..\..\..\.nuget\packages\microsoft.azure.webjobs.extensions.http\3.0.0\lib\netstandard2.0\Microsoft.Azure.WebJobs.Extensions.Http.dll</HintPath>
-    </Reference>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
+
+  <PropertyGroup>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
 
 </Project>
