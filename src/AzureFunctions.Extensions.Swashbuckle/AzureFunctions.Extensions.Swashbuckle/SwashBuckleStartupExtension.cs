@@ -1,14 +1,10 @@
-﻿using System.Buffers;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
@@ -24,14 +20,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 })
                 ;
             builder.Services.AddSingleton<IOutputFormatter>(c =>
-                new JsonOutputFormatter(new JsonSerializerSettings(), ArrayPool<char>.Create()));
-
-            builder.Services.AddSingleton<IModelMetadataProvider>(c => new DefaultModelMetadataProvider(
-                new DefaultCompositeMetadataDetailsProvider(
-                new List<IMetadataDetailsProvider>()
+                new SystemTextJsonOutputFormatter(new JsonSerializerOptions()
                 {
-                    new DefaultValidationMetadataProvider(),
-                })));
+                }));
+
+            builder.Services.AddSingleton<IModelMetadataProvider>(c => new EmptyModelMetadataProvider());
 
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
 

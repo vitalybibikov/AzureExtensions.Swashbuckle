@@ -13,6 +13,9 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -141,12 +144,15 @@ namespace AzureFunctions.Extensions.Swashbuckle
             string basePath = _option.FillSwaggerBasePathWithRoutePrefix ? $"/{RoutePrefix}" : null;
             var swaggerDocument = requiredService.GetSwagger(documentName, host, basePath);
             var mem = new MemoryStream();
-            var streamWriter = new StreamWriter(mem);
-            var mvcOptionsAccessor =
-                (IOptions<MvcJsonOptions>)_serviceProvider.GetService(typeof(IOptions<MvcJsonOptions>));
-            var serializer = SwaggerSerializerFactory.Create(mvcOptionsAccessor);
-            serializer.Serialize(streamWriter, swaggerDocument);
-            streamWriter.Flush();
+            //var streamWriter = new StreamWriter(mem);
+            //var mvcOptionsAccessor =
+            //    (IOptions<MvcJsonOptions>)_serviceProvider.GetService(typeof(IOptions
+            // <MvcJsonOptions>));
+            //var serializer = SwaggerSerializerFactory.Create(mvcOptionsAccessor);
+            swaggerDocument.SerializeAsJson(mem, OpenApiSpecVersion.OpenApi3_0);
+
+            //serializer.Serialize(streamWriter, swaggerDocument);
+            //streamWriter.Flush();
             mem.Position = 0;
             return mem;
         }
@@ -158,7 +164,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         private static void AddSwaggerDocument(SwaggerGenOptions options, OptionDocument document)
         {
-            options.SwaggerDoc(document.Name, new Info
+            options.SwaggerDoc(document.Name, new OpenApiInfo()
             {
                 Title = document.Title,
                 Version = document.Version,

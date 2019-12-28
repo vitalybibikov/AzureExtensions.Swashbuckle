@@ -6,7 +6,7 @@
     <Authors>yuka1984, vitalybibikov</Authors>
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>yuka1984</Copyright>
     <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
@@ -19,7 +19,23 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-rc5" />
+    <PackageReference Include="System.Text.Json" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="EmbededResources\index.html" />
+    <None Remove="EmbededResources\swagger-ui-bundle.js" />
+    <None Remove="EmbededResources\swagger-ui-standalone-preset.js" />
+    <None Remove="EmbededResources\swagger-ui.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="EmbededResources\index.html" />
+    <EmbeddedResource Include="EmbededResources\swagger-ui-bundle.js" />
+    <EmbeddedResource Include="EmbededResources\swagger-ui-standalone-preset.js" />
+    <EmbeddedResource Include="EmbededResources\swagger-ui.css" />
   </ItemGroup>
 
   <ItemGroup>

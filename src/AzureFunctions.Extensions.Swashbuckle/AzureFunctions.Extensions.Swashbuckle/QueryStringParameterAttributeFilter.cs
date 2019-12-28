@@ -1,30 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
     internal class QueryStringParameterAttributeFilter : IOperationFilter
     {
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var attributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
-                .Union(context.MethodInfo.GetCustomAttributes(true))
-                .OfType<QueryStringParameterAttribute>();
+            if (context.MethodInfo.DeclaringType != null)
+            {
+                var attributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                    .Union(context.MethodInfo.GetCustomAttributes(true))
+                    .OfType<QueryStringParameterAttribute>();
 
-            foreach (var attribute in attributes)
-                operation.Parameters.Add(new NonBodyParameter
+                foreach (var attribute in attributes)
                 {
-                    Name = attribute.Name,
-                    Description = attribute.Description,
-                    In = "query",
-                    Required = attribute.Required,
-                    Type = context.SchemaRegistry.GetOrRegister(attribute.DataType ?? typeof(string)).Type
-                });
+                    string attributeTypeName = "string";
+                    if (attribute.DataType != null)
+                    {
+                        attributeTypeName = attribute.DataType.ToString();
+                    }
+
+                    operation.Parameters.Add(new OpenApiParameter()
+                    {
+                        Name = attribute.Name,
+                        Description = attribute.Description,
+                        In = ParameterLocation.Query,
+                        Required = attribute.Required,
+                        Schema  = new OpenApiSchema { Type = attributeTypeName}
+                    });
+                }
+             
+            }
         }
     }
 }
