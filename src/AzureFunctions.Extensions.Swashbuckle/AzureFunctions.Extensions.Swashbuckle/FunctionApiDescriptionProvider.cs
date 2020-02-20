@@ -283,7 +283,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     Source = bindingSource,
                     RouteInfo = new ApiParameterRouteInfo
                     {
-                        IsOptional = optional,
+                        IsOptional = optional
                     }
                 };
             }
