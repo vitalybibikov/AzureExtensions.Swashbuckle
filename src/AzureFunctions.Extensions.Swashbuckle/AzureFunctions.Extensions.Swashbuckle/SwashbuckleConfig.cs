@@ -141,8 +141,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public Stream GetSwaggerDocument(string host, string documentName = "v1")
         {
             var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
-            string basePath = _option.FillSwaggerBasePathWithRoutePrefix ? $"/{RoutePrefix}" : null;
-            var swaggerDocument = requiredService.GetSwagger(documentName, host, basePath);
+            var swaggerDocument = requiredService.GetSwagger(documentName, host, string.Empty);
             var mem = new MemoryStream();
             //var streamWriter = new StreamWriter(mem);
             //var mvcOptionsAccessor =
