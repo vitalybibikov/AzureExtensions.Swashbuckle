@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using TestFunction;
 
 [assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
+
 namespace TestFunction
 {
     internal class SwashBuckleStartup : IWebJobsStartup
@@ -16,7 +14,6 @@ namespace TestFunction
         {
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
-
         }
     }
 }

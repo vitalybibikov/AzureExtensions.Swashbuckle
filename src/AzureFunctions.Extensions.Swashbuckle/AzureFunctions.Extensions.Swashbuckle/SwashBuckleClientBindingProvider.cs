@@ -18,7 +18,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         {
             var parameter = context.Parameter;
             var attribute = parameter.GetCustomAttribute<SwashBuckleClientAttribute>(false);
-            var binding = (IBinding)new SwashBuckleClientBinding(_config, context.Parameter.ParameterType);
+            var binding = (IBinding) new SwashBuckleClientBinding(_config, context.Parameter.ParameterType);
             return Task.FromResult(binding);
         }
     }

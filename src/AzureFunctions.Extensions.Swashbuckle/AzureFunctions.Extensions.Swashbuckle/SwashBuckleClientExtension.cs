@@ -27,7 +27,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public static HttpResponseMessage CreateSwaggerUIResponse(this ISwashBuckleClient client,
             HttpRequestMessage requestMessage, string documentRoute)
         {
-            string routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
+            var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
                 ? string.Empty
                 : $"/{client.RoutePrefix}";
 
@@ -38,7 +38,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var document = reader.ReadToEnd();
             var result = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                RequestMessage = requestMessage, 
+                RequestMessage = requestMessage,
                 Content = new StringContent(document, Encoding.UTF8, "text/html")
             };
             return result;

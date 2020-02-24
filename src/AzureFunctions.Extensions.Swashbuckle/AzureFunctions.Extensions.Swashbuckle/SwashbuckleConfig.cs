@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
@@ -22,16 +21,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace AzureFunctions.Extensions.Swashbuckle
 {
     [Extension("Swashbuckle", "Swashbuckle")]
-    internal class SwashbuckleConfig : IExtensionConfigProvider, IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
+    internal class SwashbuckleConfig : IExtensionConfigProvider,
+        IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
     {
-        private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
-        private readonly Option _option;
-        private readonly string _xmlPath;
-        private ServiceProvider _serviceProvider;
-        private readonly HttpOptions _httpOptions;
-
-        public string RoutePrefix => _httpOptions.RoutePrefix;
-
         private static readonly Lazy<string> IndexHtml = new Lazy<string>(() =>
         {
             var indexHtml = "";
@@ -51,7 +43,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
             }
 
             using (var stream = Assembly.GetAssembly(typeof(SwashbuckleConfig))
-                .GetManifestResourceStream($"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-bundle.js"))
+                .GetManifestResourceStream(
+                    $"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-bundle.js"))
             using (var reader = new StreamReader(stream))
             {
                 var bundlejs = reader.ReadToEnd();
@@ -59,16 +52,24 @@ namespace AzureFunctions.Extensions.Swashbuckle
             }
 
             using (var stream = Assembly.GetAssembly(typeof(SwashbuckleConfig))
-                .GetManifestResourceStream($"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-standalone-preset.js"))
+                .GetManifestResourceStream(
+                    $"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-standalone-preset.js"))
             using (var reader = new StreamReader(stream))
             {
                 var presetjs = reader.ReadToEnd();
                 indexHtml = indexHtml.Replace("{standalone-preset.js}", presetjs);
             }
+
             return indexHtml;
         });
 
+        private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
+        private readonly HttpOptions _httpOptions;
+
         private readonly Lazy<string> _indexHtmLazy;
+        private readonly Option _option;
+        private readonly string _xmlPath;
+        private ServiceProvider _serviceProvider;
 
 
         public SwashbuckleConfig(
@@ -91,13 +92,15 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     _xmlPath = xmlPath;
                 }
             }
+
             _indexHtmLazy = new Lazy<string>(() => IndexHtml.Value.Replace("{title}", _option.Title));
         }
 
-        public string GetSwaggerUIContent(string swaggerUrl)
+        public string RoutePrefix => _httpOptions.RoutePrefix;
+
+        public Task<HttpResponseMessage> ConvertAsync(HttpRequestMessage input, CancellationToken cancellationToken)
         {
-            var html = _indexHtmLazy.Value;
-            return html.Replace("{url}", swaggerUrl);
+            throw new NotImplementedException();
         }
 
         public void Initialize(ExtensionConfigContext context)
@@ -107,7 +110,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var services = new ServiceCollection();
 
-            services.AddSingleton<IApiDescriptionGroupCollectionProvider>(_apiDescriptionGroupCollectionProvider);
+            services.AddSingleton(_apiDescriptionGroupCollectionProvider);
             services.AddSwaggerGen(options =>
             {
                 if (_option.Documents.Length == 0)
@@ -129,13 +132,19 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 {
                     options.IncludeXmlComments(_xmlPath);
                 }
+
                 options.OperationFilter<FunctionsOperationFilter>();
                 options.OperationFilter<QueryStringParameterAttributeFilter>();
                 options.OperationFilter<GenerateOperationIdFilter>();
             });
 
             _serviceProvider = services.BuildServiceProvider(true);
+        }
 
+        public string GetSwaggerUIContent(string swaggerUrl)
+        {
+            var html = _indexHtmLazy.Value;
+            return html.Replace("{url}", swaggerUrl);
         }
 
         public Stream GetSwaggerDocument(string host, string documentName = "v1")
@@ -148,18 +157,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return mem;
         }
 
-        public Task<HttpResponseMessage> ConvertAsync(HttpRequestMessage input, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         private static void AddSwaggerDocument(SwaggerGenOptions options, OptionDocument document)
         {
-            options.SwaggerDoc(document.Name, new OpenApiInfo()
+            options.SwaggerDoc(document.Name, new OpenApiInfo
             {
                 Title = document.Title,
                 Version = document.Version,
-                Description = document.Description,
+                Description = document.Description
             });
         }
     }

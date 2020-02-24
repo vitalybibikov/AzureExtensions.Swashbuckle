@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
@@ -13,9 +11,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
             Description = description;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
         public Type DataType { get; set; }
-        public string Description { get; private set; }
+        public string Description { get; }
         public bool Required { get; set; } = false;
     }
 }

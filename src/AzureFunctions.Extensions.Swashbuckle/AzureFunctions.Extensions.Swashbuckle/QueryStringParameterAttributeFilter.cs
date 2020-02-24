@@ -17,22 +17,21 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
                 foreach (var attribute in attributes)
                 {
-                    string attributeTypeName = "string";
+                    var attributeTypeName = "string";
                     if (attribute.DataType != null)
                     {
                         attributeTypeName = attribute.DataType.ToString();
                     }
 
-                    operation.Parameters.Add(new OpenApiParameter()
+                    operation.Parameters.Add(new OpenApiParameter
                     {
                         Name = attribute.Name,
                         Description = attribute.Description,
                         In = ParameterLocation.Query,
                         Required = attribute.Required,
-                        Schema  = new OpenApiSchema { Type = attributeTypeName}
+                        Schema = new OpenApiSchema {Type = attributeTypeName}
                     });
                 }
-             
             }
         }
     }
