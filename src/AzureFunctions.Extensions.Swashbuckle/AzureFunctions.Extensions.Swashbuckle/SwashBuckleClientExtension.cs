@@ -10,7 +10,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public static HttpResponseMessage CreateSwaggerDocumentResponse(this ISwashBuckleClient client,
             HttpRequestMessage requestMessage, string documentName = "v1")
         {
-            var stream = client.GetSwaggerDocument(requestMessage.RequestUri.Authority, documentName);
+            var host = requestMessage.RequestUri.Scheme + "://" + requestMessage.RequestUri.Authority;
+            var stream = client.GetSwaggerDocument(host, documentName);
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 

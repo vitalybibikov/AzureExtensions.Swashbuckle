@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -25,16 +26,19 @@ namespace AzureFunctions.Extensions.Swashbuckle
         private readonly IModelMetadataProvider _modelMetadataProvider;
         private readonly IOutputFormatter _outputFormatter;
         private readonly Option _option;
+        private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
 
         public FunctionApiDescriptionProvider(
             IOptions<Option> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
+            ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
             IOutputFormatter outputFormatter,
             IOptions<HttpOptions> httOptions)
         {
             _option = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
+            _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
 
             var methods = startupConfig.Assembly.GetTypes()
@@ -253,7 +257,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var requestBodyTypeAttribute =
                     parameter.GetCustomAttribute(typeof(RequestBodyTypeAttribute)) as RequestBodyTypeAttribute;
 
-                if ((parameter.ParameterType == typeof(HttpRequestMessage) || parameter.ParameterType == typeof(HttpRequest))
+                if ((parameter.ParameterType == typeof(HttpRequestMessage) ||
+                     parameter.ParameterType == typeof(HttpRequest))
                     && requestBodyTypeAttribute == null)
                     continue;
 
@@ -283,8 +288,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     Source = bindingSource,
                     RouteInfo = new ApiParameterRouteInfo
                     {
-                        IsOptional = optional,
-                    }
+                        IsOptional = optional
+                    },
+                    ModelMetadata = new DefaultModelMetadata(_modelMetadataProvider, _compositeMetadataDetailsProvider, new DefaultMetadataDetails(
+                        ModelMetadataIdentity.ForType(type),
+                        ModelAttributes.GetAttributesForType(type)))
                 };
             }
         }
