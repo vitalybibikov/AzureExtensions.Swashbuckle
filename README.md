@@ -1,3 +1,9 @@
+- Updated to v3 Functions
+- Updated to 5.0.0 Swashbuckle.AspNetCore nugets
+- Merged PRs to fix issues related to RequestBodyType and Ignore attribute
+- application/json is a default media type.
+
+
 # azure-functions-extensions-swashbuckle
 
 Swagger tooling for API's built with Azure Functions. 
@@ -10,7 +16,7 @@ https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/s
 
 # Update
 
-Version 1.4.4
+Version 2.0.2
 
 ### bug fix 
 
