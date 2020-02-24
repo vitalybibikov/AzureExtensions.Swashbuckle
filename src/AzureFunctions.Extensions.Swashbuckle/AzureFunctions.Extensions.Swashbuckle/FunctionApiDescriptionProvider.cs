@@ -170,16 +170,18 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var supportedMediaTypes = methodInfo.GetCustomAttributes<SupportedRequestFormatAttribute>()
                 .Select(x => new ApiRequestFormat { MediaType = x.MediaType }).ToList();
+
+            SetupDefaultJsonFormatterIfNone(supportedMediaTypes);
+
             foreach (var supportedMediaType in supportedMediaTypes)
+            {
                 description.SupportedRequestFormats.Add(supportedMediaType);
+            }
 
             var parameters = GetParametersDescription(methodInfo, route).ToList();
-            foreach (var parameter in parameters)
+
+            foreach (var parameter in parameters.Where(parameter => parameter.Name != removeParamName))
             {
-                if (parameter.Name == removeParamName)
-                {
-                    continue;
-                }
                 description.ActionDescriptor.Parameters.Add(new ParameterDescriptor
                 {
                     Name = parameter.Name,
@@ -192,7 +194,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
             {
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
-
 
             if (_option.AddCodeParamater && authorizationLevel != AuthorizationLevel.Anonymous)
             {
@@ -209,6 +210,17 @@ namespace AzureFunctions.Extensions.Swashbuckle
             }
 
             return description;
+        }
+
+        private static void SetupDefaultJsonFormatterIfNone(IList<ApiRequestFormat> supportedMediaTypes)
+        {
+            if (supportedMediaTypes.Count == 0)
+            {
+                supportedMediaTypes.Add(new ApiRequestFormat
+                {
+                    MediaType = "application/json",
+                });
+            }
         }
 
         private IEnumerable<ApiResponseType> GetResponseTypes(MethodInfo methodInfo)

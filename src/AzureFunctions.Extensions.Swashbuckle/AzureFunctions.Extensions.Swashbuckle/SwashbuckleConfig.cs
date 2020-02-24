@@ -143,15 +143,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
             var swaggerDocument = requiredService.GetSwagger(documentName, host, string.Empty);
             var mem = new MemoryStream();
-            //var streamWriter = new StreamWriter(mem);
-            //var mvcOptionsAccessor =
-            //    (IOptions<MvcJsonOptions>)_serviceProvider.GetService(typeof(IOptions
-            // <MvcJsonOptions>));
-            //var serializer = SwaggerSerializerFactory.Create(mvcOptionsAccessor);
             swaggerDocument.SerializeAsJson(mem, OpenApiSpecVersion.OpenApi3_0);
-
-            //serializer.Serialize(streamWriter, swaggerDocument);
-            //streamWriter.Flush();
             mem.Position = 0;
             return mem;
         }

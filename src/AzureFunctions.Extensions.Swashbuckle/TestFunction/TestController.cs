@@ -81,7 +81,7 @@ namespace TestFunction
         /// <returns>追加結果</returns>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [QueryStringParameter("test", "test", Required = false)]
-        [SupportedRequestFormat("application/json")]
+        //[SupportedRequestFormat("application/json")]
         [FunctionName("TestAddGet")]
         public async Task<IActionResult> AddAndGet([HttpTrigger(AuthorizationLevel.Anonymous,  "post", Route = "testandget")][RequestBodyType(typeof(TestModel), "testmodel")]HttpRequest httpRequest)
         {

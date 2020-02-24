@@ -15,9 +15,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.RequestMessage = requestMessage;
-            response.Content = new StringContent(document, Encoding.UTF8, "application/json");
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                RequestMessage = requestMessage,
+                Content = new StringContent(document, Encoding.UTF8, "application/json")
+            };
 
             return response;
         }
@@ -34,9 +36,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     $"{requestMessage.RequestUri.Scheme}://{requestMessage.RequestUri.Authority.TrimEnd('/')}{routePrefix}/{documentRoute}");
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
-            var result = new HttpResponseMessage(HttpStatusCode.OK);
-            result.RequestMessage = requestMessage;
-            result.Content = new StringContent(document, Encoding.UTF8, "text/html");
+            var result = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                RequestMessage = requestMessage, 
+                Content = new StringContent(document, Encoding.UTF8, "text/html")
+            };
             return result;
         }
     }
