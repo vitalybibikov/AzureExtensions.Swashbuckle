@@ -3,6 +3,7 @@
 Swagger tooling for API's built with Azure Functions. 
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using Swashbuckle.AspNetCore.
+
 This repo is based on the work of vitalybibikov and yuka1984
 
 # Update
