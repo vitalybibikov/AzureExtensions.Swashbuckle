@@ -12,29 +12,12 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 # Sample
 
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/sample
+https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle/tree/master/sample
 
 # Update
 
-Version 2.0.2
+Version 3.0.0
 
-### bug fix 
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/20
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/13
-
-### breaking changes
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/9
-
-QueryStringParamaterAttribute -> QueryStringParameterAttribute
-
-### features
-
-https://github.com/yuka1984/azure-functions-extensions-swashbuckle/pull/18
-
-Thank you @LockTar
 
 # Getting Started
 
