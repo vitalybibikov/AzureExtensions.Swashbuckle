@@ -22,6 +22,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             builder.Services.AddSingleton<IOutputFormatter>(c =>
                 new SystemTextJsonOutputFormatter(new JsonSerializerOptions()
                 {
+                    
                 }));
 
             builder.Services.AddSingleton<IModelMetadataProvider>(c => new EmptyModelMetadataProvider());

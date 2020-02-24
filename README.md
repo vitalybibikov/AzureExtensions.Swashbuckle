@@ -4,18 +4,39 @@ Swagger tooling for API's built with Azure Functions.
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using Swashbuckle.AspNetCore.
 
-This repo is based on the work of vitalybibikov and yuka1984
+# Sample
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/tree/master/sample
 
 # Update
 
-Version 3.0.0
-Update to Functions v3
-Nuget: https://www.nuget.org/packages/AzureFunctions.Swashbuckle/
+Version 1.4.4
 
+### bug fix 
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/20
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/13
+
+### breaking changes
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/issues/9
+
+QueryStringParamaterAttribute -> QueryStringParameterAttribute
+
+### features
+
+https://github.com/yuka1984/azure-functions-extensions-swashbuckle/pull/18
+
+Thank you @LockTar
+
+# Getting Started
+
+1. Install the standard Nuget package into your Azure Functions application.
 
 ```
-Package Manager : Install-Package AzureFunctions.Swashbuckle
-CLI : dotnet add package AzureFunctions.Swashbuckle
+Package Manager : Install-Package AzureFunctions.Extensions.Swashbuckle
+CLI : dotnet add package AzureFunctions.Extensions.Swashbuckle
 ```
 
 2. Add startup class on your Functions project.
@@ -68,7 +89,7 @@ If you does not changed api route prefix. Swagger UI URL is https://hostname/api
 
 ### Include Xml document file
 
-AzureFunctions.Swashbuckle can include xml document file.
+AzureFunctions.Extensions.Swashbuckle can include xml document file.
 
 1. Change your functions project's GenerateDocumentationFile option to enable.
 
