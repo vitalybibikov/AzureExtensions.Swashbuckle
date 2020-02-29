@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +20,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     Assembly = assembly
                 })
                 ;
-            builder.Services.AddSingleton<IOutputFormatter>(c =>
-                new SystemTextJsonOutputFormatter(new JsonSerializerOptions()));
 
-            builder.Services.AddSingleton<IModelMetadataProvider>(c => new EmptyModelMetadataProvider());
+            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
+
+            builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
+            builder.Services.AddSingleton(formatter);
 
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
-
             return builder;
         }
     }
