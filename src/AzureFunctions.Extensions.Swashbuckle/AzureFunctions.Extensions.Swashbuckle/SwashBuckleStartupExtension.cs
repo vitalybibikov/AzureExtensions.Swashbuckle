@@ -24,7 +24,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
 
             builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
-            builder.Services.AddSingleton(formatter);
+            builder.Services.AddSingleton<IOutputFormatter>(formatter);
 
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
             return builder;
