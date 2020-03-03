@@ -80,6 +80,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 var regex = new Regex("/\\{(?<paramName>\\w+)\\?\\}$");
                 var match = regex.Match(route);
 
+                var routeParamRemoveRegex = new Regex(":[a-zA-Z]+(\\(.*\\))?");
+                route = routeParamRemoveRegex.Replace(route, "");
+                
                 if (match.Success && match.Captures.Count == 1)
                 {
                     routes.Add(
