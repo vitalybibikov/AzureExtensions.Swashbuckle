@@ -24,8 +24,8 @@ Version 3.0.0
 1. Install the standard Nuget package into your Azure Functions application.
 
 ```
-Package Manager : Install-Package AzureFunctions.Extensions.Swashbuckle
-CLI : dotnet add package AzureFunctions.Extensions.Swashbuckle
+Package Manager : Install-Package AzureExtensions.Swashbuckle
+CLI : dotnet add package AzureExtensions.Swashbuckle
 ```
 
 2. Add startup class on your Functions project.
