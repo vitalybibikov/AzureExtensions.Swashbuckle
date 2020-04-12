@@ -144,7 +144,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         {
             var memoryStream = new MemoryStream();
             document.SerializeAsJson(memoryStream,
-                _swaggerOptions.SerializeAsV2 ? 
+                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? 
                     OpenApiSpecVersion.OpenApi2_0 : 
                     OpenApiSpecVersion.OpenApi3_0);
 

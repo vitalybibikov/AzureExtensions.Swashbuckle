@@ -16,7 +16,8 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), new SwaggerDocOptions()
             {
-                Title = "NewTitle"
+                Title = "NewTitle",
+                SerializeAsV2 = true
             });
         }
     }

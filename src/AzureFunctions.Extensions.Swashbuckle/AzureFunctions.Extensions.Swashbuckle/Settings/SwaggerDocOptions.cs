@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.OpenApi;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Settings
 {
@@ -15,6 +16,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
 
         public bool PrependOperationWithRoutePrefix { get; set; } = true;
 
-        public bool SerializeAsV2 { get; set; } = false;
+        public OpenApiSpecVersion SpecVersion { get; set; } = OpenApiSpecVersion.OpenApi3_0;
     }
 }
