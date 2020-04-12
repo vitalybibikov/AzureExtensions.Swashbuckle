@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.FunctionBinding
 {
     internal class SwashBuckleClientBinding : IBinding
     {

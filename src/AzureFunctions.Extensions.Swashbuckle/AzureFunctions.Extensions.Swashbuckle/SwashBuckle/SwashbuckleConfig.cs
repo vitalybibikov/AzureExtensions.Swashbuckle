@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
@@ -18,7 +21,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     [Extension("Swashbuckle", "Swashbuckle")]
     internal class SwashbuckleConfig : IExtensionConfigProvider,
@@ -47,8 +50,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     $"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-bundle.js"))
             using (var reader = new StreamReader(stream))
             {
-                var bundlejs = reader.ReadToEnd();
-                indexHtml = indexHtml.Replace("{bundle.js}", bundlejs);
+                var bundleJs = reader.ReadToEnd();
+                indexHtml = indexHtml.Replace("{bundle.js}", bundleJs);
             }
 
             using (var stream = Assembly.GetAssembly(typeof(SwashbuckleConfig))
@@ -56,8 +59,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     $"{typeof(SwashbuckleConfig).Namespace}.EmbededResources.swagger-ui-standalone-preset.js"))
             using (var reader = new StreamReader(stream))
             {
-                var presetjs = reader.ReadToEnd();
-                indexHtml = indexHtml.Replace("{standalone-preset.js}", presetjs);
+                var presetJs = reader.ReadToEnd();
+                indexHtml = indexHtml.Replace("{standalone-preset.js}", presetJs);
             }
 
             return indexHtml;
@@ -113,7 +116,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
             services.AddSwaggerGen(options =>
             {
-                if (_option.Documents.Length == 0)
+                if (!_option.Documents.Any())
                 {
                     var defaultDocument = new OptionDocument();
                     AddSwaggerDocument(options, defaultDocument);
@@ -125,8 +128,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
                         AddSwaggerDocument(options, optionDocument);
                     }
                 }
-
-                options.DescribeAllEnumsAsStrings();
 
                 if (!string.IsNullOrWhiteSpace(_xmlPath))
                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -18,7 +19,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 {
     internal class FunctionApiDescriptionProvider : IApiDescriptionGroupCollectionProvider
     {
@@ -60,10 +61,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
                         typeof(ApiExplorerSettingsAttribute), false);
 
                 var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix)
-                    ? ""
+                    ? string.Empty
                     : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 string route;
-                if (_option.PrepandOperationWithRoutePrefix)
+                if (_option.PrependOperationWithRoutePrefix)
                 {
                     route =
                         $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
@@ -205,7 +206,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
 
-            if (_option.AddCodeParamater && authorizationLevel != AuthorizationLevel.Anonymous)
+            if (_option.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
             {
                 description.ParameterDescriptions.Add(new ApiParameterDescription
                 {

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
