@@ -15,7 +15,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public static IWebJobsBuilder AddSwashBuckle(this IWebJobsBuilder builder, Assembly assembly)
         {
             builder.AddExtension<SwashbuckleConfig>()
-                .BindOptions<Option>()
+                .BindOptions<SwaggerOptions>()
                 .Services.AddSingleton(new SwashBuckleStartupConfig
                 {
                     Assembly = assembly

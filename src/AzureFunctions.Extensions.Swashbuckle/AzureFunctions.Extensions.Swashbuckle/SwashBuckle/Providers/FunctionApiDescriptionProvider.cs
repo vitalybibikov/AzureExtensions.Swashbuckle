@@ -25,18 +25,18 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
     {
         private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
         private readonly IModelMetadataProvider _modelMetadataProvider;
-        private readonly Option _option;
+        private readonly SwaggerOptions _swaggerOptions;
         private readonly IOutputFormatter _outputFormatter;
 
         public FunctionApiDescriptionProvider(
-            IOptions<Option> functionsOptions,
+            IOptions<SwaggerOptions> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
             IOutputFormatter outputFormatter,
             IOptions<HttpOptions> httOptions)
         {
-            _option = functionsOptions.Value;
+            _swaggerOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
@@ -64,7 +64,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     ? string.Empty
                     : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 string route;
-                if (_option.PrependOperationWithRoutePrefix)
+                if (_swaggerOptions.PrependOperationWithRoutePrefix)
                 {
                     route =
                         $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
@@ -206,7 +206,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
 
-            if (_option.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
+            if (_swaggerOptions.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
             {
                 description.ParameterDescriptions.Add(new ApiParameterDescription
                 {

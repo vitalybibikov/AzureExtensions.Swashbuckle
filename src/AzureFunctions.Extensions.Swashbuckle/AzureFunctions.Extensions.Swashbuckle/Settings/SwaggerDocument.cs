@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
-    public class OptionDocument
+    public class SwaggerDocument
     {
         public string Name { get; set; } = "v1";
         public string Title { get; set; } = "Swashbuckle";

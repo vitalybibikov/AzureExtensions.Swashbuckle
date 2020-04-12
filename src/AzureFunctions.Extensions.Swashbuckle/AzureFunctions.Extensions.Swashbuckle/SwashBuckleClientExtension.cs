@@ -33,7 +33,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var stream =
                 client.GetSwaggerUi(
-                    $"{requestMessage.RequestUri.Scheme}://{requestMessage.RequestUri.Authority.TrimEnd('/')}{routePrefix}/{documentRoute}");
+                    $"{requestMessage.RequestUri.Scheme}://" +
+                    $"{requestMessage.RequestUri.Authority.TrimEnd('/')}" +
+                    $"{routePrefix}/{documentRoute}");
+
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
             var result = new HttpResponseMessage(HttpStatusCode.OK)
