@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -25,18 +26,18 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
     {
         private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
         private readonly IModelMetadataProvider _modelMetadataProvider;
-        private readonly SwaggerOptions _swaggerOptions;
+        private readonly SwaggerDocOptions _swaggerDocOptions;
         private readonly IOutputFormatter _outputFormatter;
 
         public FunctionApiDescriptionProvider(
-            IOptions<SwaggerOptions> functionsOptions,
+            IOptions<SwaggerDocOptions> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
             IOutputFormatter outputFormatter,
             IOptions<HttpOptions> httOptions)
         {
-            _swaggerOptions = functionsOptions.Value;
+            _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
@@ -64,7 +65,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     ? string.Empty
                     : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
                 string route;
-                if (_swaggerOptions.PrependOperationWithRoutePrefix)
+                if (_swaggerDocOptions.PrependOperationWithRoutePrefix)
                 {
                     route =
                         $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
@@ -206,7 +207,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
 
-            if (_swaggerOptions.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
+            if (_swaggerDocOptions.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
             {
                 description.ParameterDescriptions.Add(new ApiParameterDescription
                 {

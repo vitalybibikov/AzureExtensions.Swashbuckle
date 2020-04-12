@@ -18,7 +18,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions
                 throw new ArgumentNullException(nameof(assembly));
             }
 
-            return assembly.GetManifestResourceStream($"{typeof(SwashBuckleClient).Namespace}.{name}");
+            return assembly.GetManifestResourceStream($"{typeof(ISwashBuckleClient).Namespace}.{name}");
         }
     }
 }

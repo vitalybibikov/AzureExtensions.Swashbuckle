@@ -11,7 +11,7 @@ namespace TestFunction
     {
         [SwaggerIgnore]
         [FunctionName("Swagger")]
-        public static Task<HttpResponseMessage> Run(
+        public static Task<HttpResponseMessage> Swagger(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/json")]
             HttpRequestMessage req,
             [SwashBuckleClient] ISwashBuckleClient swashBuckleClient)
@@ -21,7 +21,7 @@ namespace TestFunction
 
         [SwaggerIgnore]
         [FunctionName("SwaggerUi")]
-        public static Task<HttpResponseMessage> Run2(
+        public static Task<HttpResponseMessage> SwaggerUi(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/ui")]
             HttpRequestMessage req,
             [SwashBuckleClient] ISwashBuckleClient swashBuckleClient)

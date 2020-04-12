@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -21,6 +22,7 @@ using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
@@ -49,33 +51,36 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
         private readonly HttpOptions _httpOptions;
 
-        private readonly Lazy<string> _indexHtmLazy;
-        private readonly SwaggerOptions _swaggerOptions;
+        private readonly Lazy<string> _indexHtmlLazy;
+        private readonly SwaggerDocOptions _swaggerOptions;
         private readonly string _xmlPath;
         private ServiceProvider _serviceProvider;
 
         public SwashbuckleConfig(
             IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
-            IOptions<SwaggerOptions> functionsOptions,
+            SwaggerDocOptions swaggerDocOptions,
             SwashBuckleStartupConfig startupConfig,
             IOptions<HttpOptions> httpOptions)
         {
             _apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
-            _swaggerOptions = functionsOptions.Value;
+            _swaggerOptions = swaggerDocOptions;
             _httpOptions = httpOptions.Value;
+
             if (!string.IsNullOrWhiteSpace(_swaggerOptions.XmlPath))
             {
                 var binPath = Path.GetDirectoryName(startupConfig.Assembly.Location);
                 var binDirectory = Directory.CreateDirectory(binPath);
                 var xmlBasePath = binDirectory?.Parent?.FullName;
                 var xmlPath = Path.Combine(xmlBasePath, _swaggerOptions.XmlPath);
+
                 if (File.Exists(xmlPath))
                 {
                     _xmlPath = xmlPath;
                 }
             }
 
-            _indexHtmLazy = new Lazy<string>(() => IndexHtml.Value.Replace("{title}", _swaggerOptions.Title));
+            _indexHtmlLazy = new Lazy<string>(
+                () => IndexHtml.Value.Replace("{title}", _swaggerOptions.Title));
         }
 
         public string RoutePrefix => _httpOptions.RoutePrefix;
@@ -123,7 +128,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         public string GetSwaggerUIContent(string swaggerUrl)
         {
-            var html = _indexHtmLazy.Value;
+            var html = _indexHtmlLazy.Value;
             return html.Replace("{url}", swaggerUrl);
         }
 
@@ -131,10 +136,20 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         {
             var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
             var swaggerDocument = requiredService.GetSwagger(documentName, host, string.Empty);
-            var mem = new MemoryStream();
-            swaggerDocument.SerializeAsJson(mem, OpenApiSpecVersion.OpenApi3_0);
-            mem.Position = 0;
-            return mem;
+
+            return SerializeDocument(swaggerDocument);
+        }
+
+        private MemoryStream SerializeDocument(OpenApiDocument document)
+        {
+            var memoryStream = new MemoryStream();
+            document.SerializeAsJson(memoryStream,
+                _swaggerOptions.SerializeAsV2 ? 
+                    OpenApiSpecVersion.OpenApi2_0 : 
+                    OpenApiSpecVersion.OpenApi3_0);
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         private static void AddSwaggerDocument(SwaggerGenOptions options, SwaggerDocument document)

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using TestFunction;
@@ -13,7 +14,10 @@ namespace TestFunction
         public void Configure(IWebJobsBuilder builder)
         {
             //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), new SwaggerDocOptions()
+            {
+                Title = "NewTitle"
+            });
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     internal class SwashBuckleClient : ISwashBuckleClient
     {
