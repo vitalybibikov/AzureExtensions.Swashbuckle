@@ -28,17 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="EmbededResources\index.html" />
-    <None Remove="EmbededResources\swagger-ui-bundle.js" />
-    <None Remove="EmbededResources\swagger-ui-standalone-preset.js" />
-    <None Remove="EmbededResources\swagger-ui.css" />
+    <None Remove="EmbededResources\resources.zip" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="EmbededResources\index.html" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui-bundle.js" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui-standalone-preset.js" />
-    <EmbeddedResource Include="EmbededResources\swagger-ui.css" />
+    <EmbeddedResource Include="EmbededResources\resources.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

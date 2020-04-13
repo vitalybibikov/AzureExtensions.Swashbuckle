@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -30,20 +31,24 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
     internal class SwashbuckleConfig : IExtensionConfigProvider,
         IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
     {
-        private const string IndexHtmlName = "EmbededResources.index.html";
-        private const string SwaggerUiName = "EmbededResources.swagger-ui.css";
-        private const string SwaggerUiJsName = "EmbededResources.swagger-ui-bundle.js";
-        private const string SwaggerUiJsPresetName = "EmbededResources.swagger-ui-standalone-preset.js";
+        private const string ZippedResources = "EmbededResources.resources.zip";
+        private const string IndexHtmlName = "index.html";
+        private const string SwaggerUiName = "swagger-ui.css";
+        private const string SwaggerUiJsName = "swagger-ui-bundle.js";
+        private const string SwaggerUiJsPresetName = "swagger-ui-standalone-preset.js";
 
         private static readonly Lazy<string> IndexHtml = new Lazy<string>(() =>
         {
             var indexHtml = String.Empty;
             var assembly = GetAssembly();
 
-            indexHtml = LoadAndUpdateDocument(assembly, indexHtml, IndexHtmlName);
-            indexHtml = LoadAndUpdateDocument(assembly, indexHtml, SwaggerUiName, "{style}");
-            indexHtml = LoadAndUpdateDocument(assembly, indexHtml, SwaggerUiJsName, "{bundle.js}");
-            indexHtml = LoadAndUpdateDocument(assembly, indexHtml, SwaggerUiJsPresetName, "{standalone-preset.js}");
+            using var stream = assembly.GetResourceByName(ZippedResources);
+            using var archive = new ZipArchive(stream);
+
+            indexHtml = LoadAndUpdateDocument(indexHtml, archive, IndexHtmlName);
+            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiName, "{style}");
+            indexHtml = LoadAndUpdateDocument(indexHtml, archive,SwaggerUiJsName, "{bundle.js}");
+            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsPresetName, "{standalone-preset.js}");
 
             return indexHtml;
         });
@@ -173,12 +178,13 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         }
 
         private static string LoadAndUpdateDocument(
-            Assembly assembly,
             string documentHtml,
-            string resourceName,
+            ZipArchive arcive,
+            string entryName,
             string replacement = null)
         {
-            using var stream = assembly.GetResourceByName(resourceName);
+            var entry = arcive.GetEntry(entryName);
+            using var stream = entry.Open();
             using var reader = new StreamReader(stream);
             var value = reader.ReadToEnd();
 
