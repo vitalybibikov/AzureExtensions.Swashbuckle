@@ -25,7 +25,7 @@ Updated UI to v3.24.0 version to support both 2/3 OpenAPI versions correctly
 
 **Size:**
 
-All the resources are places in zip archive in order to decrease result dll size by 357% (from 1.5mb to 460kb)
+All the resources are places in zip archive in order to decrease result dll size by 338% (from 1.594kb to 472kb)
 
 
 
