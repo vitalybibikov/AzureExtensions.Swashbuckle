@@ -35,19 +35,20 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
             IOutputFormatter outputFormatter,
-            IOptions<HttpOptions> httOptions)
+            IOptions<HttpOptions> httpOptions)
         {
             _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
 
+
+            var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())
                 .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Any())
                 .ToArray();
 
-            var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             foreach (var methodInfo in methods)
             {
                 if (!TryGetHttpTrigger(methodInfo, out var triggerAttribute))
@@ -61,14 +62,19 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     (ApiExplorerSettingsAttribute) methodInfo.DeclaringType.GetCustomAttribute(
                         typeof(ApiExplorerSettingsAttribute), false);
 
-                var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix)
+                var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
                     ? string.Empty
-                    : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
+                    : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
+
                 string route;
+
                 if (_swaggerDocOptions.PrependOperationWithRoutePrefix)
                 {
-                    route =
-                        $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+                    var routePart = !string.IsNullOrWhiteSpace(triggerAttribute.Route)
+                        ? triggerAttribute.Route
+                        : functionAttr.Name;
+
+                    route = $"{prefix}{(routePart)}";
                 }
                 else
                 {
@@ -102,11 +108,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 
                 for (var index = 0; index < routes.Count; index++)
                 {
-                    var r = routes[index];
+                    var routeTuple = routes[index];
                     var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
                     var items = verbs.Select(verb =>
-                        CreateDescription(methodInfo, r.Route, index, functionAttr, apiExplorerSettingsAttribute, verb,
-                            triggerAttribute.AuthLevel, r.RemoveParamName, verbs.Length > 1)).ToArray();
+                        CreateDescription(methodInfo, routeTuple.Route, index, functionAttr, apiExplorerSettingsAttribute, verb,
+                            triggerAttribute.AuthLevel, routeTuple.RemoveParamName, verbs.Length > 1)).ToArray();
 
                     var groupName =
                         (items.FirstOrDefault()?.ActionDescriptor as ControllerActionDescriptor)?.ControllerName ??

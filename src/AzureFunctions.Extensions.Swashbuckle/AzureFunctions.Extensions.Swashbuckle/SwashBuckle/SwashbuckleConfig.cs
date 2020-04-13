@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using AzureFunctions.Extensions.Swashbuckle.Exceptions;
 using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;

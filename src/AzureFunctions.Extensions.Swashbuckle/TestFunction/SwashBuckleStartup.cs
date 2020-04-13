@@ -25,7 +25,7 @@ namespace TestFunction
                 {
                     new SwaggerDocument()
                     {
-                        Name = "v1sdfsdf",
+                        Name = "v1",
                         Title = "Swagger document",
                         Description = "Swagger test document",
                         Version = "v2"
