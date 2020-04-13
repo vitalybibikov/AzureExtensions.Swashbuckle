@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Text.Json;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
@@ -16,27 +18,24 @@ namespace AzureFunctions.Extensions.Swashbuckle
         public static IWebJobsBuilder AddSwashBuckle(
             this IWebJobsBuilder builder,
             Assembly assembly,
-            SwaggerDocOptions docOptions = null)
+            Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
             builder.AddExtension<SwashbuckleConfig>()
-                .Services.AddSingleton(new SwashBuckleStartupConfig
+                .BindOptions<SwaggerDocOptions>()
+                .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) =>
                 {
-                    Assembly = assembly
+                    configureDocOptionsAction?.Invoke(options);
                 });
 
-            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
-
             builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
+            builder.Services.AddSingleton(new SwashBuckleStartupConfig
+            {
+                Assembly = assembly
+            });
+
+            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
             builder.Services.AddSingleton<IOutputFormatter>(formatter);
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
-
-
-            if (docOptions == null)
-            {
-                docOptions = new SwaggerDocOptions();
-            }
-
-            builder.Services.AddSingleton<SwaggerDocOptions>(docOptions);
 
             return builder;
         }

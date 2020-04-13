@@ -42,7 +42,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
 
-
             var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())

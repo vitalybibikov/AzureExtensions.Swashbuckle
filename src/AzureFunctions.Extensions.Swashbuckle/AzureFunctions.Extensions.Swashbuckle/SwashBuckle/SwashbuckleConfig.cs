@@ -63,12 +63,12 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         public SwashbuckleConfig(
             IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
-            SwaggerDocOptions swaggerDocOptions,
+            IOptions<SwaggerDocOptions> swaggerDocOptions,
             SwashBuckleStartupConfig startupConfig,
             IOptions<HttpOptions> httpOptions)
         {
             _apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
-            _swaggerOptions = swaggerDocOptions;
+            _swaggerOptions = swaggerDocOptions.Value;
             _httpOptions = httpOptions.Value;
 
             if (!string.IsNullOrWhiteSpace(_swaggerOptions.XmlPath))
@@ -126,6 +126,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 options.OperationFilter<FunctionsOperationFilter>();
                 options.OperationFilter<QueryStringParameterAttributeFilter>();
                 options.OperationFilter<GenerateOperationIdFilter>();
+
+                _swaggerOptions.ConfigureSwaggerGen?.Invoke(options);
             });
 
             _serviceProvider = services.BuildServiceProvider(true);
@@ -179,11 +181,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         private static string LoadAndUpdateDocument(
             string documentHtml,
-            ZipArchive arcive,
+            ZipArchive archive,
             string entryName,
             string replacement = null)
         {
-            var entry = arcive.GetEntry(entryName);
+            var entry = archive.GetEntry(entryName);
             using var stream = entry.Open();
             using var reader = new StreamReader(stream);
             var value = reader.ReadToEnd();
