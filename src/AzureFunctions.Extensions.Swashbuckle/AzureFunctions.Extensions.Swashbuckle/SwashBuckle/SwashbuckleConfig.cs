@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.Exceptions;
 using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;
@@ -134,10 +135,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         public Stream GetSwaggerDocument(string host, string documentName = "v1")
         {
-            var requiredService = _serviceProvider.GetRequiredService<ISwaggerProvider>();
-            var swaggerDocument = requiredService.GetSwagger(documentName, host, string.Empty);
-
-            return SerializeDocument(swaggerDocument);
+            var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
+            var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
+            return SerializeDocument(document);
         }
 
         private MemoryStream SerializeDocument(OpenApiDocument document)

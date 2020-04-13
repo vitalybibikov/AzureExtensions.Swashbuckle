@@ -4,17 +4,17 @@
         <name>TestFunction</name>
     </assembly>
     <members>
-        <member name="P:TestFunction.TestController.TestModel.Id">
+        <member name="P:TestFunction.Models.TestModel.Id">
             <summary>
                 Id
             </summary>
         </member>
-        <member name="P:TestFunction.TestController.TestModel.Name">
+        <member name="P:TestFunction.Models.TestModel.Name">
             <summary>
                 Name
             </summary>
         </member>
-        <member name="P:TestFunction.TestController.TestModel.Description">
+        <member name="P:TestFunction.Models.TestModel.Description">
             <summary>
                 Description
             </summary>
