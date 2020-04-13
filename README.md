@@ -18,6 +18,7 @@ and moved to AzureFunctions.Extensions.Swashbuckle.Settings namespace
 **Properties renamed:**
 
 PrepandOperationWithRoutePrefix => PrependOperationWithRoutePrefix
+
 AddCodeParamater => AddCodeParameter
 
 **Properties added:**
@@ -26,6 +27,7 @@ Added ability to configure SwaggerGen via ConfigureSwaggerGen
 **Versions:**
 
 Updated to Swagger 5.3.1
+
 Updated UI to v3.24.0 version to support both 2/3 OpenAPI versions correctly
 
 **Size:**
