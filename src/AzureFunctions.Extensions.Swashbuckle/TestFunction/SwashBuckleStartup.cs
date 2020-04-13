@@ -40,7 +40,7 @@ namespace TestFunction
                     x.CustomOperationIds(apiDesc =>
                     {
                         return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
-                            ? methodInfo.Name + "TestGen" 
+                            ? methodInfo.Name
                             : new Guid().ToString();
                     });
                 });
