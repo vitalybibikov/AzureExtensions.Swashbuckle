@@ -6,7 +6,9 @@ Swagger tooling for API's built with Azure Functions.
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using Swashbuckle.AspNetCore.
 
 ------------------------------
-3.1.0
+3.1.1
+
+https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.1-beta
 
 **Breaking:**
 
@@ -16,6 +18,7 @@ and moved to AzureFunctions.Extensions.Swashbuckle.Settings namespace
 **Properties renamed:**
 
 PrepandOperationWithRoutePrefix => PrependOperationWithRoutePrefix
+
 AddCodeParamater => AddCodeParameter
 
 **Properties added:**
@@ -24,6 +27,7 @@ Added ability to configure SwaggerGen via ConfigureSwaggerGen
 **Versions:**
 
 Updated to Swagger 5.3.1
+
 Updated UI to v3.24.0 version to support both 2/3 OpenAPI versions correctly
 
 **Size:**
