@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
@@ -135,6 +136,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         public string GetSwaggerUIContent(string swaggerUrl)
         {
+            if (_swaggerOptions.OverridenPathToSwaggerJson != null)
+            {
+                swaggerUrl = _swaggerOptions.OverridenPathToSwaggerJson.ToString();
+            }
+
             var html = _indexHtmlLazy.Value;
             return html.Replace("{url}", swaggerUrl);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Security.Policy;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
@@ -35,6 +36,7 @@ namespace TestFunction
                     }
                 };
                 opts.Title = "Swagger Test";
+                opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json/son");
                 opts.ConfigureSwaggerGen = (x =>
                 {
                     x.CustomOperationIds(apiDesc =>
