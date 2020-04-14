@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     internal class SwashBuckleStartupConfig
     {

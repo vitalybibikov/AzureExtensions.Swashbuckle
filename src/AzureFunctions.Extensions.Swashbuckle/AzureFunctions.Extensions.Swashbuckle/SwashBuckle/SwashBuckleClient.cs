@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     internal class SwashBuckleClient : ISwashBuckleClient
     {
@@ -18,12 +18,14 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         public Stream GetSwaggerUi(string swaggerUrl)
         {
-            var mem = new MemoryStream();
-            var writer = new StreamWriter(mem);
+            var memoryStream = new MemoryStream();
+            var writer = new StreamWriter(memoryStream);
+
             writer.Write(_config.GetSwaggerUIContent(swaggerUrl));
             writer.Flush();
-            mem.Position = 0;
-            return mem;
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         public string RoutePrefix => _config.RoutePrefix;

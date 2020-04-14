@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -18,34 +20,34 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace AzureFunctions.Extensions.Swashbuckle
+namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 {
     internal class FunctionApiDescriptionProvider : IApiDescriptionGroupCollectionProvider
     {
         private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
         private readonly IModelMetadataProvider _modelMetadataProvider;
-        private readonly Option _option;
+        private readonly SwaggerDocOptions _swaggerDocOptions;
         private readonly IOutputFormatter _outputFormatter;
 
         public FunctionApiDescriptionProvider(
-            IOptions<Option> functionsOptions,
+            IOptions<SwaggerDocOptions> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
             IOutputFormatter outputFormatter,
-            IOptions<HttpOptions> httOptions)
+            IOptions<HttpOptions> httpOptions)
         {
-            _option = functionsOptions.Value;
+            _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _outputFormatter = outputFormatter;
 
+            var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())
                 .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Any())
                 .ToArray();
 
-            var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             foreach (var methodInfo in methods)
             {
                 if (!TryGetHttpTrigger(methodInfo, out var triggerAttribute))
@@ -59,14 +61,19 @@ namespace AzureFunctions.Extensions.Swashbuckle
                     (ApiExplorerSettingsAttribute) methodInfo.DeclaringType.GetCustomAttribute(
                         typeof(ApiExplorerSettingsAttribute), false);
 
-                var prefix = string.IsNullOrWhiteSpace(httOptions.Value.RoutePrefix)
-                    ? ""
-                    : $"{httOptions.Value.RoutePrefix.TrimEnd('/')}/";
+                var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
+                    ? string.Empty
+                    : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
+
                 string route;
-                if (_option.PrepandOperationWithRoutePrefix)
+
+                if (_swaggerDocOptions.PrependOperationWithRoutePrefix)
                 {
-                    route =
-                        $"{prefix}{(!string.IsNullOrWhiteSpace(triggerAttribute.Route) ? triggerAttribute.Route : functionAttr.Name)}";
+                    var routePart = !string.IsNullOrWhiteSpace(triggerAttribute.Route)
+                        ? triggerAttribute.Route
+                        : functionAttr.Name;
+
+                    route = $"{prefix}{(routePart)}";
                 }
                 else
                 {
@@ -100,11 +107,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
                 for (var index = 0; index < routes.Count; index++)
                 {
-                    var r = routes[index];
+                    var routeTuple = routes[index];
                     var apiName = functionAttr.Name + (index == 0 ? "" : $"-{index}");
                     var items = verbs.Select(verb =>
-                        CreateDescription(methodInfo, r.Route, index, functionAttr, apiExplorerSettingsAttribute, verb,
-                            triggerAttribute.AuthLevel, r.RemoveParamName, verbs.Length > 1)).ToArray();
+                        CreateDescription(methodInfo, routeTuple.Route, index, functionAttr, apiExplorerSettingsAttribute, verb,
+                            triggerAttribute.AuthLevel, routeTuple.RemoveParamName, verbs.Length > 1)).ToArray();
 
                     var groupName =
                         (items.FirstOrDefault()?.ActionDescriptor as ControllerActionDescriptor)?.ControllerName ??
@@ -208,7 +215,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 description.SupportedResponseTypes.Add(apiResponseType);
             }
 
-            if (_option.AddCodeParamater && authorizationLevel != AuthorizationLevel.Anonymous)
+            if (_swaggerDocOptions.AddCodeParameter && authorizationLevel != AuthorizationLevel.Anonymous)
             {
                 description.ParameterDescriptions.Add(new ApiParameterDescription
                 {

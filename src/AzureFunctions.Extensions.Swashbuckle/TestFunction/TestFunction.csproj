@@ -7,7 +7,7 @@
     <DocumentationFile>TestFunction.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.5" />
     <PackageReference Include="System.Text.Json" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
@@ -20,6 +20,9 @@
     <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Update="server.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

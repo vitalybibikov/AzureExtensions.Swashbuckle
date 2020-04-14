@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Newtonsoft.Json;
+using TestFunction.Models;
 
 namespace TestFunction
 {
@@ -51,13 +52,13 @@ namespace TestFunction
 
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [QueryStringParameter("test", "test", Required = false)]
-        [FunctionName("TestAddGet")]
-        public async Task<IActionResult> AddAndGet(
+        [FunctionName("TestRequestBodyTypePresented")]
+        public async Task<IActionResult> RequestBodyTypePresented(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget")]
             [RequestBodyType(typeof(TestModel), "testmodel")]
             HttpRequest httpRequest)
         {
-            if (httpRequest.Method.ToLower() == "post")
+            if (httpRequest.Method.Equals("post", StringComparison.OrdinalIgnoreCase))
             {
                 using (var reader = new StreamReader(httpRequest.Body))
                 {
@@ -68,28 +69,6 @@ namespace TestFunction
             }
 
             return new OkResult();
-        }
-
-        public class TestModel
-        {
-            /// <summary>
-            ///     Id
-            /// </summary>
-            [Required]
-            public int Id { get; set; }
-
-            /// <summary>
-            ///     Name
-            /// </summary>
-            [Required]
-            [MaxLength(512)]
-            public string Name { get; set; }
-
-            /// <summary>
-            ///     Description
-            /// </summary>
-            [MaxLength(10240)]
-            public string Description { get; set; }
         }
     }
 }

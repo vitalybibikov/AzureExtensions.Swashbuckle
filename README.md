@@ -1,14 +1,52 @@
-- Updated to v3 Functions
-- Updated to 5.0.0 Swashbuckle.AspNetCore nugets
-- Merged PRs to fix issues related to RequestBodyType and Ignore attribute
-- application/json is a default media type.
-
 
 # azure-functions-extensions-swashbuckle
 
 Swagger tooling for API's built with Azure Functions. 
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using Swashbuckle.AspNetCore.
+
+------------------------------
+3.1.2
+
+https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.2-beta
+
+**Breaking:**
+
+Option and DocumentOption renamed to SwaggerDocOptions and SwaggerDocument respectivly
+and moved to AzureFunctions.Extensions.Swashbuckle.Settings namespace
+
+**Properties renamed:**
+
+PrepandOperationWithRoutePrefix => PrependOperationWithRoutePrefix
+
+AddCodeParamater => AddCodeParameter
+
+**Properties added:**
+
+Added ability to configure SwaggerGen via ConfigureSwaggerGen
+
+Added ability to override default url to Swagger json document (in case of reverse proxy/gateway/ingress) are used.
+
+**Versions:**
+
+Updated to Swagger 5.3.1
+
+Updated UI to v3.24.0 version to support both 2/3 OpenAPI versions correctly
+
+**Size:**
+
+All the resources are places in zip archive in order to decrease result dll size by 338% (from 1.594kb to 472kb)
+
+
+
+------------------------------
+3.0.0
+- Updated to v3 Functions
+- Updated to 5.0.0 Swashbuckle.AspNetCore nugets
+- Merged PRs to fix issues related to RequestBodyType and Ignore attribute
+- application/json is a default media type.
+
+
 
 # Sample
 

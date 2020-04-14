@@ -7,10 +7,15 @@ namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleClientExtension
     {
-        public static HttpResponseMessage CreateSwaggerDocumentResponse(this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage, string documentName = "v1")
+        public static HttpResponseMessage CreateSwaggerDocumentResponse(
+            this ISwashBuckleClient client,
+            HttpRequestMessage requestMessage,
+            string documentName = "v1")
         {
-            var host = requestMessage.RequestUri.Scheme + "://" + requestMessage.RequestUri.Authority;
+            var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
+            var scheme = requestMessage.RequestUri.Scheme;
+            var host = $"{scheme}://{authority}";
+
             var stream = client.GetSwaggerDocument(host, documentName);
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
@@ -24,8 +29,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return response;
         }
 
-        public static HttpResponseMessage CreateSwaggerUIResponse(this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage, string documentRoute)
+        public static HttpResponseMessage CreateSwaggerUIResponse(
+            this ISwashBuckleClient client,
+            HttpRequestMessage requestMessage,
+            string documentRoute)
         {
             var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
                 ? string.Empty
@@ -33,7 +40,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var stream =
                 client.GetSwaggerUi(
-                    $"{requestMessage.RequestUri.Scheme}://{requestMessage.RequestUri.Authority.TrimEnd('/')}{routePrefix}/{documentRoute}");
+                    $"{requestMessage.RequestUri.Scheme}://" +
+                    $"{requestMessage.RequestUri.Authority.TrimEnd('/')}" +
+                    $"{routePrefix}/{documentRoute}");
+
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
             var result = new HttpResponseMessage(HttpStatusCode.OK)
