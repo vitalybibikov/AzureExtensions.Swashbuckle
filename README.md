@@ -22,7 +22,9 @@ PrepandOperationWithRoutePrefix => PrependOperationWithRoutePrefix
 AddCodeParamater => AddCodeParameter
 
 **Properties added:**
+
 Added ability to configure SwaggerGen via ConfigureSwaggerGen
+
 Added ability to override default url to Swagger json document (in case of reverse proxy/gateway/ingress) are used.
 
 **Versions:**
