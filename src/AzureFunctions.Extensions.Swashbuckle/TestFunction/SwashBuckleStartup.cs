@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using System.Security.Policy;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;

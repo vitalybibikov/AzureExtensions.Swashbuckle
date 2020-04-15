@@ -4,13 +4,13 @@ using System.Net.Http;
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
     /// <summary>
-    ///     Explicite body type definition for functions with <see cref="HttpRequestMessage" /> as input parameter
+    ///     Explicit body type definition for functions with <see cref="HttpRequestMessage" /> as input parameter
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public class RequestBodyTypeAttribute : System.Attribute
     {
         /// <summary>
-        ///     Explicite body type definition for functions with <see cref="HttpRequestMessage" /> as input parameter
+        ///     Explicit body type definition for functions with <see cref="HttpRequestMessage" /> as input parameter
         /// </summary>
         /// <param name="bodyType">Body model type</param>
         /// <param name="description">Model description</param>
