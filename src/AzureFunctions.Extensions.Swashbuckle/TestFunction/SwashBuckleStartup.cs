@@ -20,7 +20,7 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
                 opts.AddCodeParameter = true;
                 opts.PrependOperationWithRoutePrefix = false;
                 opts.Documents = new []
@@ -34,7 +34,7 @@ namespace TestFunction
                     }
                 };
                 opts.Title = "Swagger Test";
-                opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json/son");
+                opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
                 opts.ConfigureSwaggerGen = (x =>
                 {
                     x.CustomOperationIds(apiDesc =>

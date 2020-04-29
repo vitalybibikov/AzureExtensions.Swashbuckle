@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -20,9 +22,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                     var attributeTypeName = "string";
                     if (attribute.DataType != null)
                     {
-                        attributeTypeName = attribute.DataType.ToString();
+                        attributeTypeName = attribute.DataType.ToOpenApiSpecType();
                     }
-
+                    
                     operation.Parameters.Add(new OpenApiParameter
                     {
                         Name = attribute.Name,

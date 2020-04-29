@@ -12,9 +12,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
             HttpRequestMessage requestMessage,
             string documentName = "v1")
         {
+            var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
+                ? string.Empty
+                : $"/{client.RoutePrefix}";
+
             var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
             var scheme = requestMessage.RequestUri.Scheme;
-            var host = $"{scheme}://{authority}";
+            var host = $"{scheme}://{authority}{routePrefix}";
 
             var stream = client.GetSwaggerDocument(host, documentName);
             var reader = new StreamReader(stream);
