@@ -22,7 +22,7 @@ namespace TestFunction
             {
                 opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
                 opts.AddCodeParameter = true;
-                opts.PrependOperationWithRoutePrefix = false;
+                opts.PrependOperationWithRoutePrefix = true;
                 opts.Documents = new []
                 {
                     new SwaggerDocument

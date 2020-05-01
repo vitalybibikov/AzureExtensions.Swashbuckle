@@ -2,15 +2,16 @@
   "version": "2.0",
 
   "extensions": {
+
+    "http": {
+      "routePrefix": "api"
+    },
+
     "Swashbuckle": {
       "XmlPath": "TestFunction.xml",
       "PrepandOperationWithRoutePrefix": true,
       "FillSwaggerBasePathWithRoutePrefix": true
     }
-  },
-
-  "http": {
-    "routePrefix": "api"
   }
 }
 
