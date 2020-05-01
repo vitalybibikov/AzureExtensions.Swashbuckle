@@ -9,8 +9,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 ------------------------------
 3.1.4
-
-https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.3-beta
+https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.4-beta
 
 Fixed #8, #9
 
