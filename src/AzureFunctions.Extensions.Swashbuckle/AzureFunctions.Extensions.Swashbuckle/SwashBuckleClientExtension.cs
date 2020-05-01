@@ -32,8 +32,12 @@ namespace AzureFunctions.Extensions.Swashbuckle
             HttpRequestMessage requestMessage,
             string documentRoute)
         {
+            var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
+                ? string.Empty
+                : $"/{client.RoutePrefix}";
+
             var host = GetBaseUri(client, requestMessage);
-            var stream = client.GetSwaggerUi($"{host}/{documentRoute}");
+            var stream = client.GetSwaggerUi($"{host}/{routePrefix}/{documentRoute}");
 
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
@@ -50,13 +54,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
         private static string GetBaseUri(ISwashBuckleClient client, HttpRequestMessage requestMessage)
         {
-            var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
-                ? string.Empty
-                : $"/{client.RoutePrefix}";
-
             var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
             var scheme = requestMessage.RequestUri.Scheme;
-            var host = $"{scheme}://{authority}{routePrefix}";
+            var host = $"{scheme}://{authority}";
 
             return host;
         }

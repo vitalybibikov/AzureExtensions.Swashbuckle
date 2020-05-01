@@ -11,12 +11,15 @@ using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
@@ -103,6 +106,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             var services = new ServiceCollection();
 
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
+
+            services.AddSingleton<IWebHostEnvironment>(new FunctionHostingEnvironment());
+
             services.AddSwaggerGen(options =>
             {
                 if (!_swaggerOptions.Documents.Any())
