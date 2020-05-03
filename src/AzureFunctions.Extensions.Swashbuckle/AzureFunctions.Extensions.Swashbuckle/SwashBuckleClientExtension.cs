@@ -37,7 +37,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 : $"/{client.RoutePrefix}";
 
             var host = GetBaseUri(client, requestMessage);
-            var stream = client.GetSwaggerUi($"{host}/{routePrefix}/{documentRoute}");
+            var stream = client.GetSwaggerUi($"{host}{routePrefix}/{documentRoute}");
 
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();

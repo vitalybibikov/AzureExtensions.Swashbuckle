@@ -34,7 +34,7 @@ namespace TestFunction
                     }
                 };
                 opts.Title = "Swagger Test";
-                opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
+                //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
                 opts.ConfigureSwaggerGen = (x =>
                 {
                     x.CustomOperationIds(apiDesc =>
