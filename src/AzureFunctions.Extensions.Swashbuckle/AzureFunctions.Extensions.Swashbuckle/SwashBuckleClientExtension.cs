@@ -12,9 +12,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             HttpRequestMessage requestMessage,
             string documentName = "v1")
         {
-            var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
-            var scheme = requestMessage.RequestUri.Scheme;
-            var host = $"{scheme}://{authority}";
+            var host = GetBaseUri(client, requestMessage);
 
             var stream = client.GetSwaggerDocument(host, documentName);
             var reader = new StreamReader(stream);
@@ -38,20 +36,29 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 ? string.Empty
                 : $"/{client.RoutePrefix}";
 
-            var stream =
-                client.GetSwaggerUi(
-                    $"{requestMessage.RequestUri.Scheme}://" +
-                    $"{requestMessage.RequestUri.Authority.TrimEnd('/')}" +
-                    $"{routePrefix}/{documentRoute}");
+            var host = GetBaseUri(client, requestMessage);
+            var stream = client.GetSwaggerUi($"{host}{routePrefix}/{documentRoute}");
 
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
+
             var result = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 RequestMessage = requestMessage,
                 Content = new StringContent(document, Encoding.UTF8, "text/html")
             };
+
             return result;
+        }
+
+
+        private static string GetBaseUri(ISwashBuckleClient client, HttpRequestMessage requestMessage)
+        {
+            var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
+            var scheme = requestMessage.RequestUri.Scheme;
+            var host = $"{scheme}://{authority}";
+
+            return host;
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using System.Security.Policy;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +20,9 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
                 opts.AddCodeParameter = true;
-                opts.PrependOperationWithRoutePrefix = false;
+                opts.PrependOperationWithRoutePrefix = true;
                 opts.Documents = new []
                 {
                     new SwaggerDocument
@@ -36,7 +34,7 @@ namespace TestFunction
                     }
                 };
                 opts.Title = "Swagger Test";
-                opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json/son");
+                //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
                 opts.ConfigureSwaggerGen = (x =>
                 {
                     x.CustomOperationIds(apiDesc =>

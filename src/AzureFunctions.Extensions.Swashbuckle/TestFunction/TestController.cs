@@ -17,7 +17,7 @@ namespace TestFunction
     {
         [ProducesResponseType(typeof(TestModel[]), (int) HttpStatusCode.OK)]
         [FunctionName("TestGets")]
-        [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int))]
+        [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int), Required = true)]
         public async Task<IActionResult> Gets([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")]
             HttpRequest request)
         {
@@ -50,8 +50,8 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new CreatedResult("", testModel));
         }
 
+
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
-        [QueryStringParameter("test", "test", Required = false)]
         [FunctionName("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget")]
