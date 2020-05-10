@@ -8,6 +8,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 ------------------------------
 3.1.6
+
 https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.6
 
 Fixed #8, #9
@@ -17,11 +18,6 @@ Updated to UI v3.25.1
 Updated to Swagger 5.4.1
 
 Fixed base url for Swagger UI
-
-------------------------------
-3.1.2-beta
-
-https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.1.2-beta
 
 **Breaking:**
 
@@ -40,11 +36,6 @@ Added ability to configure SwaggerGen via ConfigureSwaggerGen
 
 Added ability to override default url to Swagger json document (in case of reverse proxy/gateway/ingress) are used.
 
-**Versions:**
-
-Updated to Swagger 5.3.1
-
-Updated UI to v3.24.0 version to support both 2/3 OpenAPI versions correctly
 
 **Size:**
 
