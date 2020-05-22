@@ -54,7 +54,7 @@ All the resources are places in zip archive in order to decrease result dll size
 
 # Sample
 
-https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle/tree/master/sample
+https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle/tree/master/src/AzureFunctions.Extensions.Swashbuckle/TestFunction
 
 # Update
 
