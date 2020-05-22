@@ -24,6 +24,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
             },
             {
                 typeof(bool), "boolean"
+            },
+            {
+                typeof(string), "string"
             }
         };
 
