@@ -6,6 +6,8 @@
   },
 
   "SwaggerDocOptions": {
-    "Title":  "SomeTitle" 
+    "Title": "SomeTitle",
+    "XmlPath": "TestFunction.xml",
+    "PrependOperationWithRoutePrefix": true
   }
 }

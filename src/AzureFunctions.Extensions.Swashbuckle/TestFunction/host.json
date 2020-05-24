@@ -5,12 +5,6 @@
 
     "http": {
       "routePrefix": "api"
-    },
-
-    "Swashbuckle": {
-      "XmlPath": "TestFunction.xml",
-      "PrepandOperationWithRoutePrefix": true,
-      "FillSwaggerBasePathWithRoutePrefix": true
     }
   }
 }
