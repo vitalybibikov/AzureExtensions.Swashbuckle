@@ -160,7 +160,12 @@ AzureFunctions.Extensions.Swashbuckle can include xml document file.
 
 1. Change your functions project's GenerateDocumentationFile option to enable.
 
-2. Add configration setting this extensions on your functions project's hosts.json
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            {
+                opts.XmlPath = "TestFunction.xml";
+            });
+
+2. Add configration setting this extensions on your functions project's local.settings.json
 
 ```json
   "SwaggerDocOptions": {
