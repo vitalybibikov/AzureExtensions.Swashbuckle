@@ -163,12 +163,7 @@ AzureFunctions.Extensions.Swashbuckle can include xml document file.
 2. Add configration setting this extensions on your functions project's hosts.json
 
 ```json
-{
-  "version": "2.0",
-  "extensions": {
-    "Swashbuckle": {
-      "XmlPath":  "{your document xml file name}" 
-    } 
+  "SwaggerDocOptions": {
+    "XmlPath": "TestFunction.xml"
   }
-}
 ```
