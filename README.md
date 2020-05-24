@@ -1,5 +1,5 @@
 
-# azure-functions-extensions-swashbuckle
+# AzureFunctions.Extensions.Swashbuckle
 
 Swagger tooling for API's built with Azure Functions. 
 
