@@ -19,19 +19,15 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 
                 foreach (var attribute in attributes)
                 {
-                    var attributeTypeName = "string";
-                    if (attribute.DataType != null)
-                    {
-                        attributeTypeName = attribute.DataType.ToOpenApiSpecType();
-                    }
-                    
+                    var attributeTypeName = new OpenApiSchema {Type = "string"};
+
                     operation.Parameters.Add(new OpenApiParameter
                     {
                         Name = attribute.Name,
                         Description = attribute.Description,
                         In = ParameterLocation.Query,
                         Required = attribute.Required,
-                        Schema = new OpenApiSchema {Type = attributeTypeName}
+                        Schema = attribute?.DataType.ToOpenApiSpecType() ?? attributeTypeName
                     });
                 }
             }
