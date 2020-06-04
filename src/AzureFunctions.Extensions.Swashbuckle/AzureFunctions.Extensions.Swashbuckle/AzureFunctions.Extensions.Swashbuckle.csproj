@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>AzureExtensions.Swashbuckle</PackageId>
-    <Authors>yuka1984, vitalybibikov</Authors>
+    <Authors>vitalybibikov</Authors>
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>3.1.6</Version>
+    <Version>3.2.0-beta</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>yuka1984</Copyright>
     <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.4.1" />

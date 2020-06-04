@@ -2,6 +2,7 @@
 using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,9 +14,9 @@ using TestFunction;
 
 namespace TestFunction
 {
-    internal class SwashBuckleStartup : IWebJobsStartup
+    internal class SwashBuckleStartup : FunctionsStartup
     {
-        public void Configure(IWebJobsBuilder builder)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
