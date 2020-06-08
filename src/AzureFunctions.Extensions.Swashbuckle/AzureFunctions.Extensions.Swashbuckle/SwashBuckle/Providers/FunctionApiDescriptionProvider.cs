@@ -247,19 +247,24 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         {
             return methodInfo.GetCustomAttributes(typeof(ProducesResponseTypeAttribute))
                 .Select(customAttribute => customAttribute as ProducesResponseTypeAttribute)
-                .Select(responseType => new ApiResponseType
+                .Select(responseType =>
                 {
-                    ApiResponseFormats = new[]
+                    var isVoidResponseType = responseType.Type == typeof(void);
+                    
+                    return new ApiResponseType
                     {
-                        new ApiResponseFormat
+                        ApiResponseFormats = new[]
                         {
-                            Formatter = _outputFormatter,
-                            MediaType = "application/json"
-                        }
-                    },
-                    ModelMetadata = _modelMetadataProvider.GetMetadataForType(responseType.Type),
-                    Type = responseType.Type,
-                    StatusCode = responseType.StatusCode
+                            new ApiResponseFormat
+                            {
+                                Formatter = _outputFormatter,
+                                MediaType = "application/json"
+                            }
+                        },
+                        ModelMetadata = isVoidResponseType ? null : _modelMetadataProvider.GetMetadataForType(responseType.Type),
+                        Type = isVoidResponseType ? null : responseType.Type,
+                        StatusCode = responseType.StatusCode
+                    };
                 });
         }
 
