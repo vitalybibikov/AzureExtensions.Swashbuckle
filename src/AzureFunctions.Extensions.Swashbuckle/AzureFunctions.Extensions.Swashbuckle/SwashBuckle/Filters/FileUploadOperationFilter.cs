@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 {
-
     public class FileUploadOperationFilter : IOperationFilter
     {
+        private const string MimeType = "multipart/form-data";
+
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (context.MethodInfo.DeclaringType != null)
             {
-                //if (!(operation?.RequestBody?.Content?.Any(x => x.Key.ToLower() == "multipart/form-data") ?? false)) return;
-
                 var uploadFiles = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
                     .Union(context.MethodInfo.GetCustomAttributes(true))
                     .OfType<SwaggerUploadFileAttribute>();
@@ -28,51 +28,30 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 }
 
                 var uploadFile = swaggerUploadFiles.First();
+                operation.RequestBody ??= new OpenApiRequestBody();
 
-                if (operation.RequestBody == null)
+                if (!operation.RequestBody.Content.ContainsKey(MimeType))
                 {
-                    operation.RequestBody = new OpenApiRequestBody();
+                    operation.RequestBody.Content[MimeType] = new OpenApiMediaType();
                 }
 
-                if (!operation.RequestBody.Content.ContainsKey("multipart/form-data"))
-                {
-                    operation.RequestBody.Content["multipart/form-data"] = new OpenApiMediaType();
-                }
+                operation.RequestBody.Content[MimeType].Schema ??= new OpenApiSchema();
 
-                if (operation.RequestBody.Content["multipart/form-data"].Schema == null)
+                var uploadFileMediaType = new OpenApiMediaType
                 {
-                    operation.RequestBody.Content["multipart/form-data"].Schema = new OpenApiSchema();
-                }
-
-                //operation.RequestBody.Content["multipart/form-data"].Schema.Properties =
-                //    new Dictionary<string, OpenApiSchema>
-                //    {
-                //        {
-                //            "upload",
-                //            new OpenApiSchema 
-                //            {
-                //                Type = "object",
-                //                Format = "binary",
-                //                Description = uploadFile.Description
-                //            }
-                //        }
-                //    };
-
-                var uploadFileMediaType = new OpenApiMediaType()
-                {
-                    Schema = new OpenApiSchema()
+                    Schema = new OpenApiSchema
                     {
                         Type = "object",
                         Properties =
                         {
-                            ["uploadedFile"] = new OpenApiSchema()
+                            ["uploadedFile"] = new OpenApiSchema
                             {
-                                Description = "Upload File",
+                                Description = "File to upload.",
                                 Type = "file",
                                 Format = "binary"
                             }
                         },
-                        Required = new HashSet<string>()
+                        Required = new HashSet<string>
                         {
                             "uploadedFile"
                         }
@@ -83,37 +62,17 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 {
                     Content =
                     {
-                        ["multipart/form-data"] = uploadFileMediaType
+                        [MimeType] = uploadFileMediaType
                     }
                 };
 
-
                 if (!string.IsNullOrEmpty(uploadFile.Example))
                 {
-                    operation.RequestBody.Content["multipart/form-data"].Schema.Example =
+                    operation.RequestBody.Content[MimeType].Schema.Example =
                         new OpenApiString(uploadFile.Example);
-                    operation.RequestBody.Content["multipart/form-data"].Schema.Description = uploadFile.Example;
+                    operation.RequestBody.Content[MimeType].Schema.Description = uploadFile.Example;
                 }
             }
         }
-    }
-
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    public class SwaggerUploadFileAttribute : System.Attribute
-    {
-        public SwaggerUploadFileAttribute(string name, string description)
-        {
-            Name = name;
-            Description = description;
-        }
-
-        public string Name { get; }
-
-        public string Parameter { get; set; }
-
-        public string Description { get; set; }
-
-        public string Example { get; set; }
     }
 }

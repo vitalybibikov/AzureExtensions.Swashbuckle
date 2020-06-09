@@ -5,7 +5,7 @@
     <Authors>vitalybibikov</Authors>
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>3.2.0-beta</Version>
+    <Version>3.2.1-beta</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>yuka1984</Copyright>
     <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
