@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -69,6 +71,29 @@ namespace TestFunction
             }
 
             return new OkResult();
+        }
+
+
+        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [FunctionName("TestUpload")]
+        [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
+        public async Task<IActionResult> TestUpload(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/upload")]
+            HttpRequestMessage httpRequest)
+
+        {
+            var data = await httpRequest.Content.ReadAsMultipartAsync();
+
+            if (data != null && data.Contents != null)
+            {
+                foreach (var content in data.Contents)
+                {
+                    var result = await content.ReadAsStringAsync();
+                    return new OkObjectResult(result.Length); 
+                }
+            }
+
+            return new NoContentResult();
         }
     }
 }
