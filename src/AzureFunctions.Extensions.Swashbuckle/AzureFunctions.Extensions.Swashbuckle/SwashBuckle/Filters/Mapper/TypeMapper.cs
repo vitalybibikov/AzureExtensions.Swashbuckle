@@ -6,7 +6,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
 {
     public static class TypeMapper
     {
-        private static readonly Dictionary<Type, Func<OpenApiSchema>> simpleTypeToOpenApiSchema =
+        private static readonly Dictionary<Type, Func<OpenApiSchema>> SimpleTypeToOpenApiSchema =
             new Dictionary<Type, Func<OpenApiSchema>>
             {
                 [typeof(bool)] = () => new OpenApiSchema {Type = "boolean"},
@@ -48,14 +48,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
                 [typeof(object)] = () => new OpenApiSchema {Type = "object"}
             };
 
-        public static OpenApiSchema MapToOpenApiSchema(this Type type)
+        public static OpenApiSchema ToOpenApiSpecType(this Type type)
         {
             if (type == null)
             {
                 throw new ArgumentNullException(nameof(type));
             }
 
-            return simpleTypeToOpenApiSchema.TryGetValue(type, out var result)
+            return SimpleTypeToOpenApiSchema.TryGetValue(type, out var result)
                 ? result()
                 : new OpenApiSchema {Type = "string"};
         }
