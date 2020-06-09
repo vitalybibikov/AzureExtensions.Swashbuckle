@@ -52,7 +52,6 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new CreatedResult("", testModel));
         }
 
-
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(

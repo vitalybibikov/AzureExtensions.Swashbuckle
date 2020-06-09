@@ -3,7 +3,6 @@ using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
@@ -21,7 +20,7 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
                 opts.AddCodeParameter = true;
                 opts.PrependOperationWithRoutePrefix = true;
                 opts.XmlPath = "TestFunction.xml";
