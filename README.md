@@ -1,5 +1,5 @@
 
-# azure-functions-extensions-swashbuckle
+# AzureExtensions.Swashbuckle
 
 Swagger tooling for API's built with Azure Functions. 
 
@@ -54,7 +54,7 @@ All the resources are places in zip archive in order to decrease result dll size
 
 # Sample
 
-https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle/tree/master/sample
+https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle/tree/master/src/AzureFunctions.Extensions.Swashbuckle/TestFunction
 
 # Update
 
@@ -85,6 +85,42 @@ namespace YourAppNamespace
         }
     }
 }
+```
+
+or you can create a more defailed configuration like this:
+
+```
+        public void Configure(IWebJobsBuilder builder)
+        {
+            //Register the extension
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            {
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
+                opts.AddCodeParameter = true;
+                opts.PrependOperationWithRoutePrefix = true;
+                opts.Documents = new []
+                {
+                    new SwaggerDocument
+                    {
+                        Name = "v1",
+                        Title = "Swagger document",
+                        Description = "Swagger test document",
+                        Version = "v2"
+                    }
+                };
+                opts.Title = "Swagger Test";
+                //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
+                opts.ConfigureSwaggerGen = (x =>
+                {
+                    x.CustomOperationIds(apiDesc =>
+                    {
+                        return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
+                            ? methodInfo.Name
+                            : new Guid().ToString();
+                    });
+                });
+            });
+        }
 ```
 
 3. Add swagger and swagger ui endpoint functions on your project.
@@ -124,15 +160,15 @@ AzureFunctions.Extensions.Swashbuckle can include xml document file.
 
 1. Change your functions project's GenerateDocumentationFile option to enable.
 
-2. Add configration setting this extensions on your functions project's hots.json
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            {
+                opts.XmlPath = "TestFunction.xml";
+            });
+
+2. Add configration setting this extensions on your functions project's local.settings.json
 
 ```json
-{
-  "version": "2.0",
-  "extensions": {
-    "Swashbuckle": {
-      "XmlPath":  "{your document xml file name}" 
-    } 
+  "SwaggerDocOptions": {
+    "XmlPath": "TestFunction.xml"
   }
-}
 ```
