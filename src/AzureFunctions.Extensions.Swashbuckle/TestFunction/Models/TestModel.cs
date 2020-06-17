@@ -8,20 +8,20 @@ namespace TestFunction.Models
     public class TestModel
     {
         /// <summary>
-        ///     Id
+        ///     Id (example)
         /// </summary>
         [Required]
         public int Id { get; set; }
 
         /// <summary>
-        ///     Name
+        ///     Name (example)
         /// </summary>
         [Required]
         [MaxLength(512)]
         public string Name { get; set; }
 
         /// <summary>
-        ///     Description
+        ///     Description (example)
         /// </summary>
         [MaxLength(10240)]
         public string Description { get; set; }

@@ -132,6 +132,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 options.OperationFilter<FunctionsOperationFilter>();
                 options.OperationFilter<QueryStringParameterAttributeFilter>();
                 options.OperationFilter<GenerateOperationIdFilter>();
+                options.OperationFilter<FileUploadOperationFilter>();
 
                 _swaggerOptions.ConfigureSwaggerGen?.Invoke(options);
             });

@@ -6,17 +6,17 @@
     <members>
         <member name="P:TestFunction.Models.TestModel.Id">
             <summary>
-                Id
+                Id (example)
             </summary>
         </member>
         <member name="P:TestFunction.Models.TestModel.Name">
             <summary>
-                Name
+                Name (example)
             </summary>
         </member>
         <member name="P:TestFunction.Models.TestModel.Description">
             <summary>
-                Description
+                Description (example)
             </summary>
         </member>
     </members>
