@@ -27,14 +27,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
         private readonly IModelMetadataProvider _modelMetadataProvider;
         private readonly SwaggerDocOptions _swaggerDocOptions;
-        private readonly SystemTextJsonOutputFormatter _outputFormatter;
+        private readonly IOutputFormatter _outputFormatter;
 
         public FunctionApiDescriptionProvider(
             IOptions<SwaggerDocOptions> functionsOptions,
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
-            SystemTextJsonOutputFormatter outputFormatter,
+            IOutputFormatter outputFormatter,
             IOptions<HttpOptions> httpOptions)
         {
             _swaggerDocOptions = functionsOptions.Value;
@@ -137,15 +137,15 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         private bool TryGetHttpTrigger(MethodInfo methodInfo, out HttpTriggerAttribute triggerAttribute)
         {
             triggerAttribute = null;
-
             var ignore = methodInfo.GetCustomAttributes().Any(x => x is SwaggerIgnoreAttribute);
             if (ignore)
-            {
                 return false;
-            }
 
             triggerAttribute = FindHttpTriggerAttribute(methodInfo);
-            return triggerAttribute != null;
+            if (triggerAttribute == null)
+                return false;
+
+            return true;
         }
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route, int routeIndex,
@@ -270,7 +270,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 
         private HttpTriggerAttribute FindHttpTriggerAttribute(MethodInfo methodInfo)
         {
-            HttpTriggerAttribute? triggerAttribute = null;
+            HttpTriggerAttribute triggerAttribute = null;
             foreach (var parameter in methodInfo.GetParameters())
             {
                 triggerAttribute = parameter.GetCustomAttributes(typeof(HttpTriggerAttribute), false)
