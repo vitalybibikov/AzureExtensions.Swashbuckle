@@ -195,7 +195,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             string documentHtml,
             ZipArchive archive,
             string entryName,
-            string replacement = null)
+            string? replacement = null)
         {
             var entry = archive.GetEntry(entryName);
             using var stream = entry.Open();

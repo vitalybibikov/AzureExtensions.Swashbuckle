@@ -20,10 +20,10 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
                 opts.AddCodeParameter = true;
                 opts.PrependOperationWithRoutePrefix = true;
-                opts.XmlPath = "TestFunction.xml";
+                //opts.XmlPath = "TestFunction.xml";
                 opts.Documents = new []
                 {
                     new SwaggerDocument
@@ -44,6 +44,7 @@ namespace TestFunction
                             ? methodInfo.Name
                             : new Guid().ToString();
                     });
+                    x.IncludeXmlComments("TestFunction.xml");
                 });
             });
         }

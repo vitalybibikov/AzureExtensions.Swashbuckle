@@ -26,6 +26,13 @@ namespace TestFunction
             return new OkObjectResult(new[] {new TestModel(), new TestModel()});
         }
 
+        /// <summary>
+        /// TestGet Function
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="id"></param>
+        /// <remarks>Awesomeness!</remarks>
+        /// <response code="200">Product created</response>
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
         [FunctionName("TestGet")]
         public Task<IActionResult> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "test/{id}")]
@@ -71,7 +78,6 @@ namespace TestFunction
 
             return new OkResult();
         }
-
 
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestUpload")]

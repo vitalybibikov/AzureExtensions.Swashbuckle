@@ -189,7 +189,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             };
 
             var supportedMediaTypes = methodInfo.GetCustomAttributes<SupportedRequestFormatAttribute>()
-                .Select(x => new ApiRequestFormat {MediaType = x.MediaType}).ToList();
+                .Select(x => new ApiRequestFormat {MediaType = x.MediaType})
+                .ToList();
 
             SetupDefaultJsonFormatterIfNone(supportedMediaTypes);
 
@@ -270,13 +271,15 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 
         private HttpTriggerAttribute FindHttpTriggerAttribute(MethodInfo methodInfo)
         {
-            HttpTriggerAttribute triggerAttribute = null;
+            HttpTriggerAttribute? triggerAttribute = null;
             foreach (var parameter in methodInfo.GetParameters())
             {
                 triggerAttribute = parameter.GetCustomAttributes(typeof(HttpTriggerAttribute), false)
                     .FirstOrDefault() as HttpTriggerAttribute;
                 if (triggerAttribute != null)
+                {
                     break;
+                }
             }
 
             return triggerAttribute;
@@ -297,16 +300,21 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                 if ((parameter.ParameterType == typeof(HttpRequestMessage) ||
                      parameter.ParameterType == typeof(HttpRequest))
                     && requestBodyTypeAttribute == null)
+                {
                     continue;
+                }
 
                 if (IgnoreParameter(parameter))
+                {
                     continue;
+                }
 
-                var hasHttpTrigerAttribute = parameter.GetCustomAttributes().Any(attr => attr is HttpTriggerAttribute);
-                var hasFromUriAttribute =
-                    false; // parameter.GetCustomAttributes().Any(attr => attr is FromUriAttribute);
+                var hasHttpTriggerAttribute = parameter.GetCustomAttributes()
+                    .Any(attr => attr is HttpTriggerAttribute);
 
-                var type = hasHttpTrigerAttribute && requestBodyTypeAttribute != null
+                var hasFromUriAttribute = false;
+
+                var type = hasHttpTriggerAttribute && requestBodyTypeAttribute != null
                     ? requestBodyTypeAttribute.Type
                     : parameter.ParameterType;
 
