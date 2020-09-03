@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -29,14 +28,16 @@ namespace TestFunction
         /// <summary>
         /// TestGet Function
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="id"></param>
+        /// <param name="request">some request</param>
+        /// <param name="id"> some id </param>
         /// <remarks>Awesomeness!</remarks>
         /// <response code="200">Product created</response>
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
         [FunctionName("TestGet")]
-        public Task<IActionResult> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "test/{id}")]
-            HttpRequest request, int id)
+        public Task<IActionResult> Get(
+            int id,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "test/{id}")]
+            HttpRequest request)
         {
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
         }
@@ -62,9 +63,10 @@ namespace TestFunction
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget/{id}")]
             [RequestBodyType(typeof(TestModel), "testmodel")]
-            HttpRequest httpRequest)
+            HttpRequest httpRequest,
+            long id)
         {
             if (httpRequest.Method.Equals("post", StringComparison.OrdinalIgnoreCase))
             {

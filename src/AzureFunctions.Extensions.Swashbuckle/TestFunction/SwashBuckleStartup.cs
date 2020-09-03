@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
+using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,10 +22,10 @@ namespace TestFunction
             //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
+                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
                 opts.AddCodeParameter = true;
                 opts.PrependOperationWithRoutePrefix = true;
-                //opts.XmlPath = "TestFunction.xml";
+                opts.XmlPath = "TestFunction.xml";
                 opts.Documents = new []
                 {
                     new SwaggerDocument
@@ -44,7 +46,6 @@ namespace TestFunction
                             ? methodInfo.Name
                             : new Guid().ToString();
                     });
-                    x.IncludeXmlComments("TestFunction.xml");
                 });
             });
         }
