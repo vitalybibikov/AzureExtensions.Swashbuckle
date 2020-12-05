@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
+using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
@@ -126,7 +127,13 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
                 if (!string.IsNullOrWhiteSpace(_xmlPath))
                 {
+                    var xmlDoc = new XPathDocument(_xmlPath);
                     options.IncludeXmlComments(_xmlPath);
+
+                    if (xmlDoc != null)
+                    {
+                        options.OperationFilter<XmlCommentsOperationFilterWithParams>(xmlDoc);
+                    }
                 }
 
                 options.OperationFilter<FunctionsOperationFilter>();
@@ -195,7 +202,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             string documentHtml,
             ZipArchive archive,
             string entryName,
-            string replacement = null)
+            string? replacement = null)
         {
             var entry = archive.GetEntry(entryName);
             using var stream = entry.Open();
