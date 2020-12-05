@@ -19,5 +19,14 @@
                 Description (example)
             </summary>
         </member>
+        <member name="M:TestFunction.TestController.Get(System.Int32,Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            TestGet Function
+            </summary>
+            <param name="request">some request</param>
+            <param name="id"> some id </param>
+            <remarks>Awesomeness!</remarks>
+            <response code="200">Product created</response>
+        </member>
     </members>
 </doc>
