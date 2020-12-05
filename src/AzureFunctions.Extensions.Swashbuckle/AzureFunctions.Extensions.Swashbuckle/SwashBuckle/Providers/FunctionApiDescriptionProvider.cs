@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
@@ -40,7 +41,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
-            _outputFormatter = outputFormatter;
+            //_outputFormatter = outputFormatter;
 
             var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
@@ -245,6 +246,22 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 
         private IEnumerable<ApiResponseType> GetResponseTypes(MethodInfo methodInfo)
         {
+           // Assembly asm =
+           //     Assembly.Load(
+           //         "Microsoft.AspNetCore.Mvc.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60");
+           // Assembly asm2 =
+           //     Assembly.Load(
+           //         "System.Text.Json, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51");
+           // Type typ1 = asm2.GetType("System.Text.Json.JsonSerializerOptions");
+
+           // var O1 = Activator.CreateInstance(typ1);
+           //// new SystemTextJsonOutputFormatter()
+           // Type typ = asm.GetType("Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter");
+
+           // var O = (IOutputFormatter) Activator.CreateInstance(typ,  new object[] { O1 } );
+
+           // var form = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
+
             return methodInfo.GetCustomAttributes(typeof(ProducesResponseTypeAttribute))
                 .Select(customAttribute => customAttribute as ProducesResponseTypeAttribute)
                 .Select(responseType =>

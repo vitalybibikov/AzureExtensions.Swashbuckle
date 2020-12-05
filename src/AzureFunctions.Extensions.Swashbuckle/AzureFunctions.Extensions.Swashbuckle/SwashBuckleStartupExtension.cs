@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
+using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Formatters;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -34,8 +35,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 Assembly = assembly
             });
 
-            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
+            var formatter = new SystemTextJsonOutputFormatter2(new JsonSerializerOptions());
             builder.Services.AddSingleton<IOutputFormatter>(formatter);
+
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
 
             return builder;
@@ -61,7 +63,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 Assembly = assembly
             });
 
-            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
+            var formatter = new SystemTextJsonOutputFormatter2(new JsonSerializerOptions());
             builder.Services.AddSingleton<IOutputFormatter>(formatter);
             builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
 

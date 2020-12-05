@@ -53,6 +53,15 @@ namespace TestFunction
         }
 
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [FunctionName("TestAdd2")]
+        public Task<IActionResult> GetWildcard([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test/wildcard/{*path}")]
+            TestModel testModel,
+            string path)
+        {
+            return Task.FromResult<IActionResult>(new CreatedResult("", testModel));
+        }
+
+        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget")]
@@ -68,10 +77,8 @@ namespace TestFunction
                     return new CreatedResult("", testModel);
                 }
             }
-
             return new OkResult();
         }
-
 
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestUpload")]
