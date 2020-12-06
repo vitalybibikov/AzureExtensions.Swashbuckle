@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -52,6 +54,17 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
         }
 
+        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
+        [QueryStringParameter("pageSorting", "pageSorting", DataType = typeof(IEnumerable<string>), Required = false)]
+        [FunctionName("TestGetSomethingWithArray")]
+        public Task<IActionResult> GetSomethingWithArray(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "arraytest")]
+            HttpRequest request)
+        {
+            var items = request.Query["pageSorting"].ToList();
+            return Task.FromResult<IActionResult>(new OkObjectResult(items));
+        }
+
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [FunctionName("TestAdd")]
         public Task<IActionResult> Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test")]
@@ -84,6 +97,7 @@ namespace TestFunction
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
         [RequestHttpHeader("x-ms-session-id", true)]
         [FunctionName("TestUpload")]
+        [RequestHttpHeader("x-ms-session-id", true)]
         [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
         public async Task<IActionResult> TestUpload(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/upload")]
