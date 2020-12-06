@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Security.Policy;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -11,7 +10,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
     {
         public string Title { get; set; } = Assembly.GetAssembly(typeof(SwaggerDocOptions)).GetName().Name;
 
-        public string XmlPath { get; set; }
+        public string? XmlPath { get; set; }
 
         public bool AddCodeParameter { get; set; } = true;
 

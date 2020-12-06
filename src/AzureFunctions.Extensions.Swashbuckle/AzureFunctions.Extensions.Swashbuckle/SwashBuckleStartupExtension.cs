@@ -15,7 +15,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleStartupExtension
     {
-        [Obsolete("Please, use FunctionsStartup instead")]
+        [Obsolete("Please, use FunctionsStartup instead, will be deprecated soon")]
         public static IWebJobsBuilder AddSwashBuckle(
             this IWebJobsBuilder builder,
             Assembly assembly,
@@ -46,14 +46,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
             Assembly assembly,
             Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
-            var wbBuilder = builder.Services.AddWebJobs(x => { return; });
+            var wbBuilder = builder.Services.AddWebJobs(_ => { });
 
             wbBuilder.AddExtension<SwashbuckleConfig>()
                 .BindOptions<SwaggerDocOptions>()
-                .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) =>
-                {
-                    configureDocOptionsAction?.Invoke(options);
-                });
+                .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) => configureDocOptionsAction?.Invoke(options));
 
             builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
             builder.Services.AddSingleton(new SwashBuckleStartupConfig

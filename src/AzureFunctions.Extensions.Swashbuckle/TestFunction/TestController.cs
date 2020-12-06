@@ -82,6 +82,7 @@ namespace TestFunction
         }
 
         [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [RequestHttpHeader("x-ms-session-id", true)]
         [FunctionName("TestUpload")]
         [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
         public async Task<IActionResult> TestUpload(

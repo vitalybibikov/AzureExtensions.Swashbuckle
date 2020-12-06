@@ -80,11 +80,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 var binPath = Path.GetDirectoryName(startupConfig.Assembly.Location);
                 var binDirectory = Directory.CreateDirectory(binPath);
                 var xmlBasePath = binDirectory?.Parent?.FullName;
-                var xmlPath = Path.Combine(xmlBasePath, _swaggerOptions.XmlPath);
-
-                if (File.Exists(xmlPath))
+                if (xmlBasePath != null)
                 {
-                    _xmlPath = xmlPath;
+                    var xmlPath = Path.Combine(xmlBasePath, _swaggerOptions.XmlPath);
+
+                    if (File.Exists(xmlPath))
+                    {
+                        _xmlPath = xmlPath;
+                    }
                 }
             }
 
