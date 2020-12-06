@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
@@ -108,6 +109,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
 
             services.AddSingleton<IWebHostEnvironment>(new FunctionHostingEnvironment());
+            services.AddTransient<ISchemaGenerator, SchemaGenerator>(x =>  
+                    new SchemaGenerator(new SchemaGeneratorOptions(), 
+                        new JsonSerializerDataContractResolver(new JsonSerializerOptions())));
 
             services.AddSwaggerGen(options =>
             {
