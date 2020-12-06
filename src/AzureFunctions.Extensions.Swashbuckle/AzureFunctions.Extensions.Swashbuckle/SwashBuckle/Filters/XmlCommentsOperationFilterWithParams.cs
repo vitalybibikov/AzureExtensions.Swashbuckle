@@ -13,7 +13,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 
         public XmlCommentsOperationFilterWithParams(XPathDocument xmlDoc)
         {
-            _xmlNavigator = xmlDoc.CreateNavigator();
+            _xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
         }
 
         public void Apply(OpenApiOperation operation, OperationFilterContext context)

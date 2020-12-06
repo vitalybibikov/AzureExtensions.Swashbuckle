@@ -136,11 +136,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 {
                     var xmlDoc = new XPathDocument(_xmlPath);
                     options.IncludeXmlComments(_xmlPath);
-
-                    if (xmlDoc != null)
-                    {
-                        options.OperationFilter<XmlCommentsOperationFilterWithParams>(xmlDoc);
-                    }
+                    options.OperationFilter<XmlCommentsOperationFilterWithParams>(xmlDoc);
                 }
 
                 options.OperationFilter<FunctionsOperationFilter>();

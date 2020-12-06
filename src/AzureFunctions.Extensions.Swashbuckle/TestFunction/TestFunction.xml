@@ -8,16 +8,19 @@
             <summary>
                 Id (example)
             </summary>
+            <example>3</example>
         </member>
         <member name="P:TestFunction.Models.TestModel.Name">
             <summary>
                 Name (example)
             </summary>
+            <example>John</example>
         </member>
         <member name="P:TestFunction.Models.TestModel.Description">
             <summary>
                 Description (example)
             </summary>
+            <example>Sometimes human</example>
         </member>
         <member name="M:TestFunction.TestController.Get(System.Int32,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
