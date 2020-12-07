@@ -36,9 +36,28 @@ namespace TestFunction
         /// <response code="200">Product created</response>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [FunctionName("TestGet")]
+        [ApiExplorerSettings(GroupName = "v1")]
         public Task<IActionResult> Get(
             int id,
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "test/{id}")]
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/test/{id}")]
+            HttpRequest request)
+        {
+            return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
+        }
+
+        /// <summary>
+        /// TestGet Function
+        /// </summary>
+        /// <param name="request">some request</param>
+        /// <param name="id"> some id </param>
+        /// <remarks>Awesomeness!</remarks>
+        /// <response code="200">Product created</response>
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
+        [FunctionName("TestGetv2")]
+        [ApiExplorerSettings(GroupName = "v2")]
+        public Task<IActionResult> Get2(
+            int id,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v2/test/{id}")]
             HttpRequest request)
         {
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.OpenApi.Any;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
