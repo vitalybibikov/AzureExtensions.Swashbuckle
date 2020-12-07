@@ -9,6 +9,7 @@ using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TestFunction;
+using TestFunction.CustomFilterExample;
 
 [assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
 
@@ -51,8 +52,8 @@ namespace TestFunction
                         ? methodInfo.Name
                         : new Guid().ToString());
 
-                    //x.SwaggerDoc("v1", new OpenApiInfo { Title = "My API - V1", Version = "v1" });
-                    //x.SwaggerDoc("v2", new OpenApiInfo { Title = "My API - V2", Version = "v2" });
+                    //custom filter example
+                    //x.DocumentFilter<RemoveSchemasFilter>();
                 };
             });
         }
