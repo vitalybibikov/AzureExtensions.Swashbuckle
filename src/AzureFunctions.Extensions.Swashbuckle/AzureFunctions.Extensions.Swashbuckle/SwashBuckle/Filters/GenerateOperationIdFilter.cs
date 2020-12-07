@@ -8,12 +8,12 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            if (context.ApiDescription.ActionDescriptor is ControllerActionDescriptor
-                && !string.IsNullOrEmpty((context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)
+            if (context.ApiDescription.ActionDescriptor is ControllerActionDescriptor descriptor
+                && !string.IsNullOrEmpty(descriptor
                     .ActionName))
             {
                 operation.OperationId =
-                    (context.ApiDescription.ActionDescriptor as ControllerActionDescriptor).ActionName;
+                    descriptor.ActionName;
             }
         }
     }

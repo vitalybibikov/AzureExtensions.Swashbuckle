@@ -21,7 +21,6 @@ using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
@@ -52,7 +51,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
             indexHtml = LoadAndUpdateDocument(indexHtml, archive, IndexHtmlName);
             indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiName, "{style}");
-            indexHtml = LoadAndUpdateDocument(indexHtml, archive,SwaggerUiJsName, "{bundle.js}");
+            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsName, "{bundle.js}");
             indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsPresetName, "{standalone-preset.js}");
 
             return indexHtml;
@@ -113,9 +112,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
 
             services.AddSingleton<IWebHostEnvironment>(new FunctionHostingEnvironment());
-            services.AddTransient<ISchemaGenerator, SchemaGenerator>(x =>  
-                    new SchemaGenerator(new SchemaGeneratorOptions(), 
-                        new JsonSerializerDataContractResolver(new JsonSerializerOptions())));
 
             services.AddSwaggerGen(options =>
             {
@@ -137,6 +133,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                     var xmlDoc = new XPathDocument(_xmlPath);
                     options.IncludeXmlComments(_xmlPath);
                     options.OperationFilter<XmlCommentsOperationFilterWithParams>(xmlDoc);
+                    options.ParameterFilter<XmlCommentsParameterFilterWithExamples>(xmlDoc);
+                    options.SchemaFilter<XmlCommentsSchemaFilterChanged>(xmlDoc);
                 }
 
                 options.OperationFilter<FunctionsOperationFilter>();
@@ -172,8 +170,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         {
             var memoryStream = new MemoryStream();
             document.SerializeAsJson(memoryStream,
-                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? 
-                    OpenApiSpecVersion.OpenApi2_0 : 
+                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
+                    OpenApiSpecVersion.OpenApi2_0 :
                     OpenApiSpecVersion.OpenApi3_0);
 
             memoryStream.Position = 0;

@@ -18,13 +18,13 @@ namespace TestFunction
     [ApiExplorerSettings(GroupName = "testee")]
     public class TestController
     {
-        [ProducesResponseType(typeof(TestModel[]), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
         [FunctionName("TestGets")]
         [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int), Required = true)]
         public async Task<IActionResult> Gets([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")]
             HttpRequest request)
         {
-            return new OkObjectResult(new[] {new TestModel(), new TestModel()});
+            return new OkObjectResult(new[] { new TestModel(), new TestModel() });
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace TestFunction
         /// <param name="id"> some id </param>
         /// <remarks>Awesomeness!</remarks>
         /// <response code="200">Product created</response>
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [FunctionName("TestGet")]
         public Task<IActionResult> Get(
             int id,
@@ -44,7 +44,7 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
         }
 
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [QueryStringParameter("name", "this is name", DataType = typeof(string), Required = true)]
         [FunctionName("TestGetCat")]
         public Task<IActionResult> GetCat(
@@ -54,7 +54,7 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new OkObjectResult(new TestModel()));
         }
 
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [QueryStringParameter("pageSorting", "pageSorting", DataType = typeof(IEnumerable<string>), Required = false)]
         [FunctionName("TestGetSomethingWithArray")]
         public Task<IActionResult> GetSomethingWithArray(
@@ -65,7 +65,7 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new OkObjectResult(items));
         }
 
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [FunctionName("TestAdd")]
         public Task<IActionResult> Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test")]
             TestModel testModel)
@@ -73,7 +73,7 @@ namespace TestFunction
             return Task.FromResult<IActionResult>(new CreatedResult("", testModel));
         }
 
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [FunctionName("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget/{id}")]
@@ -94,7 +94,7 @@ namespace TestFunction
             return new OkResult();
         }
 
-        [ProducesResponseType(typeof(TestModel), (int) HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [RequestHttpHeader("x-ms-session-id", true)]
         [FunctionName("TestUpload")]
         [RequestHttpHeader("x-ms-session-id", true)]
@@ -111,7 +111,7 @@ namespace TestFunction
                 foreach (var content in data.Contents)
                 {
                     var result = await content.ReadAsStringAsync();
-                    return new OkObjectResult(result.Length); 
+                    return new OkObjectResult(result.Length);
                 }
             }
 

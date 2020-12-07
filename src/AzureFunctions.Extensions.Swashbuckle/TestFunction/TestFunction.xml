@@ -4,6 +4,11 @@
         <name>TestFunction</name>
     </assembly>
     <members>
+        <member name="T:TestFunction.Models.TestModel">
+            <summary>
+            Some model
+            </summary>
+        </member>
         <member name="P:TestFunction.Models.TestModel.Id">
             <summary>
                 Id (example)
