@@ -22,6 +22,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             var memoryStream = new MemoryStream();
             var writer = new StreamWriter(memoryStream);
             writer.Write(content);
+            writer.Flush();
             memoryStream.Seek(0, SeekOrigin.Begin);
             return memoryStream;
         }
