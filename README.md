@@ -7,7 +7,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 
 ------------------------------
-3.3.1
+3.3.1-beta
 
 - #64 Support for authorization configuration
 - #60 Consolidated extensions and added one to support .net 5
