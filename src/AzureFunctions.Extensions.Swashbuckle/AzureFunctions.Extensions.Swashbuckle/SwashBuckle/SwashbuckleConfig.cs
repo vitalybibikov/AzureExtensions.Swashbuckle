@@ -32,7 +32,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     [Extension("Swashbuckle", "Swashbuckle")]
-    internal class SwashbuckleConfig : IExtensionConfigProvider,
+    public sealed class SwashbuckleConfig : IExtensionConfigProvider,
         IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
     {
         private const string ZippedResources = "EmbededResources.resources.zip";

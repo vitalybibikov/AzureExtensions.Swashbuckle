@@ -2,7 +2,7 @@
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
-    internal class SwashBuckleClient : ISwashBuckleClient
+    public sealed class SwashBuckleClient : ISwashBuckleClient
     {
         private readonly SwashbuckleConfig _config;
 
