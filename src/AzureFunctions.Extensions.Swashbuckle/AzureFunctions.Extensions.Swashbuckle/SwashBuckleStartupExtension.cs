@@ -21,23 +21,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             Assembly assembly,
             Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
-            builder.AddExtension<SwashbuckleConfig>()
-                .BindOptions<SwaggerDocOptions>()
-                .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) =>
-                {
-                    configureDocOptionsAction?.Invoke(options);
-                });
-
-            builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
-            builder.Services.AddSingleton(new SwashBuckleStartupConfig
-            {
-                Assembly = assembly
-            });
-
-            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
-            builder.Services.AddSingleton<IOutputFormatter>(formatter);
-            builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
-
+            builder.Services.AddSwashBuckle(assembly, configureDocOptionsAction, builder);
             return builder;
         }
 
@@ -46,23 +30,33 @@ namespace AzureFunctions.Extensions.Swashbuckle
             Assembly assembly,
             Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
-            var wbBuilder = builder.Services.AddWebJobs(_ => { });
+            builder.Services.AddSwashBuckle(assembly, configureDocOptionsAction);
+            return builder;
+        }
 
-            wbBuilder.AddExtension<SwashbuckleConfig>()
+        public static IServiceCollection AddSwashBuckle(
+            this IServiceCollection services,
+            Assembly assembly,
+            Action<SwaggerDocOptions> configureDocOptionsAction = null, 
+            IWebJobsBuilder webJobsBuilder = null)
+        {
+            webJobsBuilder ??= services.AddWebJobs(_ => { });
+
+            webJobsBuilder.AddExtension<SwashbuckleConfig>()
                 .BindOptions<SwaggerDocOptions>()
                 .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) => configureDocOptionsAction?.Invoke(options));
 
-            builder.Services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
-            builder.Services.AddSingleton(new SwashBuckleStartupConfig
+            services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
+            services.AddSingleton(new SwashBuckleStartupConfig
             {
                 Assembly = assembly
             });
 
             var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
-            builder.Services.AddSingleton<IOutputFormatter>(formatter);
-            builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
+            services.AddSingleton<IOutputFormatter>(formatter);
+            services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
 
-            return builder;
+            return services;
         }
     }
 }
