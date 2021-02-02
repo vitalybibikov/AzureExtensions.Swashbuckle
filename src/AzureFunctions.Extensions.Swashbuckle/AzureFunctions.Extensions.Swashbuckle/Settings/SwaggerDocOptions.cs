@@ -23,5 +23,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
         public OpenApiSpecVersion SpecVersion { get; set; } = OpenApiSpecVersion.OpenApi3_0;
 
         public Action<SwaggerGenOptions> ConfigureSwaggerGen { get; set; }
+
+        public string ClientId { get; set; } = "";
+
+        public string OAuth2RedirectPath { get; set; } = "";
+
     }
 }

@@ -28,5 +28,23 @@ namespace TestFunction
         {
             return Task.FromResult(swashBuckleClient.CreateSwaggerUIResponse(req, "swagger/json"));
         }
+
+        /// <summary>
+        /// This is only needed for OAuth2 client. This redirecting document is normally served
+        /// as a static content. Functions don't provide this out of the box, so we serve it here.
+        /// Don't forget to set OAuth2RedirectPath configuration option to reflect this route.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="swashBuckleClient"></param>
+        /// <returns></returns>
+        [SwaggerIgnore]
+        [FunctionName("SwaggerOAuth2Redirect")]
+        public static Task<HttpResponseMessage> SwaggerOAuth2Redirect(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger/oauth2-redirect")]
+            HttpRequestMessage req,
+            [SwashBuckleClient] ISwashBuckleClient swashBuckleClient)
+        {
+            return Task.FromResult(swashBuckleClient.CreateSwaggerOAuth2RedirectResponse(req));
+        }
     }
 }
