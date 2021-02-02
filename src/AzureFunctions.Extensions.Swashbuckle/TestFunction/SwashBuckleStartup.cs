@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
@@ -54,7 +55,30 @@ namespace TestFunction
 
                     //custom filter example
                     //x.DocumentFilter<RemoveSchemasFilter>();
+
+                    //oauth2
+                    x.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
+                        {
+                            Implicit = new OpenApiOAuthFlow
+                            {
+                                AuthorizationUrl = new Uri("https://your.idserver.net/connect/authorize"),
+                                Scopes = new Dictionary<string, string>
+                                {
+                                    { "api.read", "Access read operations" },
+                                    { "api.write", "Access write operations" }
+                                }
+                            }
+                        }
+                    });
                 };
+
+                // set up your client ID if your API is protected
+                opts.ClientId = "your.client.id";
+                opts.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
+
             });
         }
     }

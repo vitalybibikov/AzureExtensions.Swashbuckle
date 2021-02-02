@@ -7,5 +7,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
         string RoutePrefix { get; }
         Stream GetSwaggerDocument(string host, string documentName = "v1");
         Stream GetSwaggerUi(string swaggerUrl);
+        Stream GetSwaggerOAuth2Redirect();
     }
 }

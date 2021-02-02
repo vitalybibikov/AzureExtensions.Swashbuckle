@@ -51,6 +51,22 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return result;
         }
 
+        public static HttpResponseMessage CreateSwaggerOAuth2RedirectResponse(
+            this ISwashBuckleClient client,
+            HttpRequestMessage requestMessage)
+        {
+            var stream = client.GetSwaggerOAuth2Redirect();
+            var reader = new StreamReader(stream);
+            var document = reader.ReadToEnd();
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                RequestMessage = requestMessage,
+                Content = new StringContent(document, Encoding.UTF8, "text/html")
+            };
+
+            return response;
+        }
 
         private static string GetBaseUri(ISwashBuckleClient client, HttpRequestMessage requestMessage)
         {

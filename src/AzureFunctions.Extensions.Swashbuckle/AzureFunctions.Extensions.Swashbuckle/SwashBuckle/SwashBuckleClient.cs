@@ -16,6 +16,17 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             return _config.GetSwaggerDocument(host, documentName);
         }
 
+        public Stream GetSwaggerOAuth2Redirect()
+        {
+            var content = _config.GetSwaggerOAuth2RedirectContent();
+            var memoryStream = new MemoryStream();
+            var writer = new StreamWriter(memoryStream);
+            writer.Write(content);
+            writer.Flush();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
+        }
+
         public Stream GetSwaggerUi(string swaggerUrl)
         {
             var memoryStream = new MemoryStream();
