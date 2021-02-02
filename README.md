@@ -14,7 +14,9 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 - Updated docs
 - Updated js/html/css libs
 - Some classed made public to support 3-party IoC.
+https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.3.1-beta
 
+------------------------------
 https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.3.0-beta
 - Fixed several issues, related to versioning and XML comments.
 - Updated to UI v3.37.2
