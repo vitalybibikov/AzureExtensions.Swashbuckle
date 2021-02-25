@@ -10,13 +10,23 @@ namespace TestFunction
     public static class SwaggerController
     {
         [SwaggerIgnore]
-        [FunctionName("Swagger")]
-        public static Task<HttpResponseMessage> Swagger(
+        [FunctionName("SwaggerJson")]
+        public static Task<HttpResponseMessage> SwaggerJson(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/json")]
             HttpRequestMessage req,
             [SwashBuckleClient] ISwashBuckleClient swashBuckleClient)
         {
-            return Task.FromResult(swashBuckleClient.CreateSwaggerDocumentResponse(req));
+            return Task.FromResult(swashBuckleClient.CreateSwaggerJsonDocumentResponse(req));
+        }
+
+        [SwaggerIgnore]
+        [FunctionName("SwaggerYaml")]
+        public static Task<HttpResponseMessage> SwaggerYaml(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/yaml")]
+            HttpRequestMessage req,
+            [SwashBuckleClient] ISwashBuckleClient swashBuckleClient)
+        {
+            return Task.FromResult(swashBuckleClient.CreateSwaggerYamlDocumentResponse(req));
         }
 
         [SwaggerIgnore]
