@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +18,19 @@ namespace TestFunction
     [ApiExplorerSettings(GroupName = "testee")]
     public class TestController
     {
+
+        [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
+        [FunctionName("TestGetWithExamples")]
+        [QueryStringParameter("colour", "The colour of the bike", "Red", Required = true)]
+        [QueryStringParameter("wheelsize", "Size of wheel", 26, Required = true)]
+        [QueryStringParameter("used", "Must be used", false, Required = false)]
+        public async Task<IActionResult> GetExamples([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "getexampletest")]
+            HttpRequest request)
+        {
+            return new OkObjectResult(new[] { new TestModel(), new TestModel() });
+        }
+
+
         [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
         [FunctionName("TestGets")]
         [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int), Required = true)]
