@@ -11,9 +11,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             _config = config;
         }
 
-        public Stream GetSwaggerDocument(string host, string documentName = "v1")
+        public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
         {
-            return _config.GetSwaggerDocument(host, documentName);
+            return _config.GetSwaggerJsonDocument(host, documentName);
+        }
+
+        public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
+        {
+            return _config.GetSwaggerYamlDocument(host, documentName);
         }
 
         public Stream GetSwaggerOAuth2Redirect()

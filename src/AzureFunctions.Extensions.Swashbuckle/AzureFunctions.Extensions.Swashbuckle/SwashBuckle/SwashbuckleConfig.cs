@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
@@ -27,7 +26,6 @@ using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
@@ -182,17 +180,36 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 .Replace("{clientId}", _swaggerOptions.ClientId);
         }
 
-        public Stream GetSwaggerDocument(string host, string documentName = "v1")
+        public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
         {
             var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return SerializeDocument(document);
+            return SerializeJsonDocument(document);
         }
 
-        private MemoryStream SerializeDocument(OpenApiDocument document)
+        public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
+        {
+            var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
+            var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
+            return SerializeYamlDocument(document);
+        }
+
+        private MemoryStream SerializeJsonDocument(OpenApiDocument document)
         {
             var memoryStream = new MemoryStream();
             document.SerializeAsJson(memoryStream,
+                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
+                    OpenApiSpecVersion.OpenApi2_0 :
+                    OpenApiSpecVersion.OpenApi3_0);
+
+            memoryStream.Position = 0;
+            return memoryStream;
+        }
+
+        private MemoryStream SerializeYamlDocument(OpenApiDocument document)
+        {
+            var memoryStream = new MemoryStream();
+            document.SerializeAsYaml(memoryStream,
                 _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
                     OpenApiSpecVersion.OpenApi2_0 :
                     OpenApiSpecVersion.OpenApi3_0);
