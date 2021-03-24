@@ -2,7 +2,7 @@
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
-    internal class SwashBuckleStartupConfig
+    public sealed class SwashBuckleStartupConfig
     {
         public Assembly Assembly { get; set; }
     }

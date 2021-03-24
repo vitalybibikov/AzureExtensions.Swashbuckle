@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
@@ -28,11 +27,10 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     [Extension("Swashbuckle", "Swashbuckle")]
-    internal class SwashbuckleConfig : IExtensionConfigProvider,
+    public sealed class SwashbuckleConfig : IExtensionConfigProvider,
         IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
     {
         private const string ZippedResources = "EmbededResources.resources.zip";
@@ -40,6 +38,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         private const string SwaggerUiName = "swagger-ui.css";
         private const string SwaggerUiJsName = "swagger-ui-bundle.js";
         private const string SwaggerUiJsPresetName = "swagger-ui-standalone-preset.js";
+        private const string SwaggerOAuth2RedirectName = "oauth2-redirect.html";
 
         private static readonly Lazy<string> IndexHtml = new Lazy<string>(() =>
         {
@@ -61,6 +60,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         private readonly HttpOptions _httpOptions;
 
         private readonly Lazy<string> _indexHtmlLazy;
+        private readonly Lazy<string> _oauth2RedirectLazy;
         private readonly SwaggerDocOptions _swaggerOptions;
         private readonly string _xmlPath;
         private ServiceProvider _serviceProvider;
@@ -93,6 +93,17 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
             _indexHtmlLazy = new Lazy<string>(
                 () => IndexHtml.Value.Replace("{title}", _swaggerOptions.Title));
+
+            _oauth2RedirectLazy = new Lazy<string>(() => {
+                var assembly = GetAssembly();
+                using var stream = assembly.GetResourceByName(ZippedResources);
+                using var archive = new ZipArchive(stream);
+                var entry = archive.GetEntry(SwaggerOAuth2RedirectName);
+
+                using var entryStream = entry.Open();
+                using var reader = new StreamReader(entryStream);
+                return reader.ReadToEnd();
+            });
         }
 
         public string RoutePrefix => _httpOptions.RoutePrefix;
@@ -148,6 +159,13 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             _serviceProvider = services.BuildServiceProvider(true);
         }
 
+
+
+        public string GetSwaggerOAuth2RedirectContent()
+        {
+            return _oauth2RedirectLazy.Value;
+        }
+
         public string GetSwaggerUIContent(string swaggerUrl)
         {
             if (_swaggerOptions.OverridenPathToSwaggerJson != null)
@@ -156,20 +174,42 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             }
 
             var html = _indexHtmlLazy.Value;
-            return html.Replace("{url}", swaggerUrl);
+            return html
+                .Replace("{url}", swaggerUrl)
+                .Replace("{oauth2RedirectUrl}", _swaggerOptions.OAuth2RedirectPath)
+                .Replace("{clientId}", _swaggerOptions.ClientId);
         }
 
-        public Stream GetSwaggerDocument(string host, string documentName = "v1")
+        public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
         {
             var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return SerializeDocument(document);
+            return SerializeJsonDocument(document);
         }
 
-        private MemoryStream SerializeDocument(OpenApiDocument document)
+        public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
+        {
+            var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
+            var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
+            return SerializeYamlDocument(document);
+        }
+
+        private MemoryStream SerializeJsonDocument(OpenApiDocument document)
         {
             var memoryStream = new MemoryStream();
             document.SerializeAsJson(memoryStream,
+                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
+                    OpenApiSpecVersion.OpenApi2_0 :
+                    OpenApiSpecVersion.OpenApi3_0);
+
+            memoryStream.Position = 0;
+            return memoryStream;
+        }
+
+        private MemoryStream SerializeYamlDocument(OpenApiDocument document)
+        {
+            var memoryStream = new MemoryStream();
+            document.SerializeAsYaml(memoryStream,
                 _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
                     OpenApiSpecVersion.OpenApi2_0 :
                     OpenApiSpecVersion.OpenApi3_0);
