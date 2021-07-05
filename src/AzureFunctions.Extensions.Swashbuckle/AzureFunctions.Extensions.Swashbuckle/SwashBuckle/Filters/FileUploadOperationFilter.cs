@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.OpenApi.Any;
@@ -37,6 +36,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 
                 operation.RequestBody.Content[MimeType].Schema ??= new OpenApiSchema();
 
+                var uploadFileName = string.IsNullOrEmpty(uploadFile.Name)
+                    ? "uploadedFile"
+                    : uploadFile.Name;
+
+                var uploadFileDescription = string.IsNullOrEmpty(uploadFile.Name)
+                    ? "File to upload."
+                    : uploadFile.Description;
+
                 var uploadFileMediaType = new OpenApiMediaType
                 {
                     Schema = new OpenApiSchema
@@ -44,16 +51,16 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                         Type = "object",
                         Properties =
                         {
-                            ["uploadedFile"] = new OpenApiSchema
+                            [uploadFileName] = new OpenApiSchema
                             {
-                                Description = "File to upload.",
+                                Description = uploadFileDescription,
                                 Type = "file",
                                 Format = "binary"
                             }
                         },
                         Required = new HashSet<string>
                         {
-                            "uploadedFile"
+                            uploadFileName
                         }
                     }
                 };
