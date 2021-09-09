@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.OpenApi.Any;
@@ -40,7 +40,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                     ? "uploadedFile"
                     : uploadFile.Name;
 
-                var uploadFileDescription = string.IsNullOrEmpty(uploadFile.Name)
+                var uploadFileDescription = string.IsNullOrEmpty(uploadFile.Description)
                     ? "File to upload."
                     : uploadFile.Description;
 
