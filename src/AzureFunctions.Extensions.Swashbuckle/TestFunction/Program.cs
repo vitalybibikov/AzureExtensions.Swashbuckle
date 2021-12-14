@@ -1,27 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AzureFunctions.Extensions.Swashbuckle;
-using AzureFunctions.Extensions.Swashbuckle.Settings;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.Hosting;
+using System.IO;
+using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
+using Synigo.OneApi.Core.Functions.Extensions;
+using Synigo.OneApi.Core.Functions.Middleware;
+using Synigo.OneApi.Storage;
+using System;
+using AzureFunctions.Extensions.Swashbuckle;
+using System.Reflection;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TestFunction;
-using TestFunction.CustomFilterExample;
-
-[assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
+using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
 
 namespace TestFunction
 {
-    internal class SwashBuckleStartup : FunctionsStartup
+    public class Program
     {
-        public override void Configure(IFunctionsHostBuilder builder)
+
+        public static void Main(string[] args)
+            => CreateHostBuilder(args)
+            .Build()
+            .Run();
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            var hostBuilder = new HostBuilder()
+                .ConfigureLogging((context, logging) =>
+                {
+                    logging.ClearProviders();
+                    logging.AddDebug();
+                    logging.AddConsole();
+                })
+                .ConfigureFunctionsWorkerDefaults(workerApplication =>
+                {
+                    //exception middleware form synigo.openapi.core.functions
+                    workerApplication.UseOneApiExceptionMiddleware();
+                })
+                .ConfigureServices(service => ConfigureServices(service));
+
+            Console.WriteLine("BOEM");
+            return hostBuilder;
+
+            hostBuilder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
             {
                 opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
                 opts.AddCodeParameter = true;
@@ -80,6 +107,12 @@ namespace TestFunction
                 opts.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
 
             });
+
+            return hostBuilder;
+        }
+        internal static void ConfigureServices(IServiceCollection services)
+        {
+
         }
     }
 }

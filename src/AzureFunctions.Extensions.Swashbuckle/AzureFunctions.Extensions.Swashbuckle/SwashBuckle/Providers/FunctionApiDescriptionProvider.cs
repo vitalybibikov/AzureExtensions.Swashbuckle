@@ -14,10 +14,9 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Azure.Functions.Worker;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 {
@@ -33,8 +32,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
-            IOutputFormatter outputFormatter,
-            IOptions<HttpOptions> httpOptions)
+            IOutputFormatter outputFormatter)
         {
             _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
@@ -44,7 +42,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())
-                .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Any())
+                .Where(m => m.GetCustomAttributes(typeof(FunctionAttribute), false).Any())
                 .ToArray();
 
             foreach (var methodInfo in methods)
@@ -53,16 +51,20 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     continue;
 
                 var functionAttr =
-                    (FunctionNameAttribute) methodInfo.GetCustomAttribute(typeof(FunctionNameAttribute), false);
+                    (FunctionAttribute) methodInfo.GetCustomAttribute(typeof(FunctionAttribute), false);
                 var apiExplorerSettingsAttribute =
                     (ApiExplorerSettingsAttribute) methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute),
                         false) ??
                     (ApiExplorerSettingsAttribute) methodInfo.DeclaringType.GetCustomAttribute(
                         typeof(ApiExplorerSettingsAttribute), false);
 
+                /*
                 var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
                     ? string.Empty
                     : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
+                */
+
+                var prefix = "";
 
                 string route;
 
@@ -148,7 +150,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         }
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route, int routeIndex,
-            FunctionNameAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
+            FunctionAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
             string verb, AuthorizationLevel authorizationLevel, string removeParamName = null, bool manyVerbs = false)
         {
             string controllerName;
@@ -347,7 +349,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             var ignoreParameterAttribute = parameter.GetCustomAttribute(typeof(SwaggerIgnoreAttribute));
             if (ignoreParameterAttribute != null) return true;
             if (parameter.ParameterType.Name == "TraceWriter") return true;
-            if (parameter.ParameterType == typeof(ExecutionContext)) return true;
             if (parameter.ParameterType == typeof(ILogger)) return true;
             if (parameter.ParameterType.IsAssignableFrom(typeof(ILogger))) return true;
             if (parameter.ParameterType.IsAssignableFrom(typeof(ISwashBuckleClient))) return true;

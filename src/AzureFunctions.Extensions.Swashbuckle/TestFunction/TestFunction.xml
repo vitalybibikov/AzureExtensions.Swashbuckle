@@ -27,16 +27,7 @@
             </summary>
             <example>Sometimes human</example>
         </member>
-        <member name="M:TestFunction.SwaggerController.SwaggerOAuth2Redirect(System.Net.Http.HttpRequestMessage,AzureFunctions.Extensions.Swashbuckle.ISwashBuckleClient)">
-            <summary>
-            This is only needed for OAuth2 client. This redirecting document is normally served
-            as a static content. Functions don't provide this out of the box, so we serve it here.
-            Don't forget to set OAuth2RedirectPath configuration option to reflect this route.
-            </summary>
-            <param name="req"></param>
-            <param name="swashBuckleClient"></param>
-            <returns></returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:TestFunction.SwaggerController.SwaggerOAuth2Redirect(Microsoft.Azure.Functions.Worker.Http.HttpRequestData)" -->
         <member name="M:TestFunction.TestController.Get(System.Int32,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             TestGet Function

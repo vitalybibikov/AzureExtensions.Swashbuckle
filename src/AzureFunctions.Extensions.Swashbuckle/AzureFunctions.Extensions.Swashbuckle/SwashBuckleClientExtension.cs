@@ -2,14 +2,16 @@
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Microsoft.Azure.Functions.Worker.Http;
+
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleClientExtension
     {
-        public static HttpResponseMessage CreateSwaggerJsonDocumentResponse(
+        public static HttpResponseData CreateSwaggerJsonDocumentResponse(
             this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage,
+            HttpRequestData requestMessage,
             string documentName = "v1")
         {
             var host = GetBaseUri(client, requestMessage);
@@ -18,18 +20,16 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                RequestMessage = requestMessage,
-                Content = new StringContent(document, Encoding.UTF8, "application/json")
-            };
+            var result = requestMessage.CreateResponse(HttpStatusCode.OK);
+            result.WriteString(document);
+            result.Headers.Add("Content-Type", "application/json charset=utf-8");
+            return result;
 
-            return response;
         }
 
-        public static HttpResponseMessage CreateSwaggerYamlDocumentResponse(
+        public static HttpResponseData CreateSwaggerYamlDocumentResponse(
             this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage,
+            HttpRequestData requestMessage,
             string documentName = "v1")
         {
             var host = GetBaseUri(client, requestMessage);
@@ -38,18 +38,15 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                RequestMessage = requestMessage,
-                Content = new StringContent(document, Encoding.UTF8, "application/json")
-            };
-
-            return response;
+            var result = requestMessage.CreateResponse(HttpStatusCode.OK);
+            result.WriteString(document);
+            result.Headers.Add("Content-Type", "application/json charset=utf-8");
+            return result;
         }
 
-        public static HttpResponseMessage CreateSwaggerUIResponse(
+        public static HttpResponseData CreateSwaggerUIResponse(
             this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage,
+            HttpRequestData requestMessage,
             string documentRoute)
         {
             var routePrefix = string.IsNullOrEmpty(client.RoutePrefix)
@@ -62,36 +59,30 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                RequestMessage = requestMessage,
-                Content = new StringContent(document, Encoding.UTF8, "text/html")
-            };
-
+            var result = requestMessage.CreateResponse(HttpStatusCode.OK);
+            result.WriteString(document);
+            result.Headers.Add("Content-Type", "text/html; charset=utf-8");
             return result;
         }
 
-        public static HttpResponseMessage CreateSwaggerOAuth2RedirectResponse(
+        public static HttpResponseData CreateSwaggerOAuth2RedirectResponse(
             this ISwashBuckleClient client,
-            HttpRequestMessage requestMessage)
+            HttpRequestData requestMessage)
         {
             var stream = client.GetSwaggerOAuth2Redirect();
             var reader = new StreamReader(stream);
             var document = reader.ReadToEnd();
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                RequestMessage = requestMessage,
-                Content = new StringContent(document, Encoding.UTF8, "text/html")
-            };
-
-            return response;
+            var result = requestMessage.CreateResponse(HttpStatusCode.OK);
+            result.WriteString(document);
+            result.Headers.Add("Content-Type", "text/html; charset=utf-8");
+            return result;
         }
 
-        private static string GetBaseUri(ISwashBuckleClient client, HttpRequestMessage requestMessage)
+        private static string GetBaseUri(ISwashBuckleClient client, HttpRequestData requestMessage)
         {
-            var authority = requestMessage.RequestUri.Authority.TrimEnd('/');
-            var scheme = requestMessage.RequestUri.Scheme;
+            var authority = requestMessage.Url.Authority.TrimEnd('/');
+            var scheme = requestMessage.Url.Scheme;
             var host = $"{scheme}://{authority}";
 
             return host;

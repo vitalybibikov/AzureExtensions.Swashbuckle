@@ -1,11 +1,12 @@
 ﻿using System;
-using Microsoft.Azure.WebJobs.Description;
+using Microsoft.Azure.Functions.Worker.Extensions.Abstractions;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
-    [Binding]
+
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class SwashBuckleClientAttribute : System.Attribute
+    public class SwashBuckleClientAttribute : InputBindingAttribute
     {
+
     }
 }

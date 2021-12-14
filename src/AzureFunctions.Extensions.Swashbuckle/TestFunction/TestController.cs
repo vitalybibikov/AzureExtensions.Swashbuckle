@@ -9,9 +9,10 @@ using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Newtonsoft.Json;
 using TestFunction.Models;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace TestFunction
 {
@@ -133,20 +134,9 @@ namespace TestFunction
         [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
         public async Task<IActionResult> TestUpload(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/upload")]
-            HttpRequestMessage httpRequest)
+            HttpRequestData httpRequest)
 
         {
-            var data = await httpRequest.Content.ReadAsMultipartAsync();
-
-            if (data != null && data.Contents != null)
-            {
-                foreach (var content in data.Contents)
-                {
-                    var result = await content.ReadAsStringAsync();
-                    return new OkObjectResult(result.Length);
-                }
-            }
-
             return new NoContentResult();
         }
     }

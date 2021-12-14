@@ -1,13 +1,14 @@
 {
+
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   },
-
-  "SwaggerDocOptions": {
-    "Title": "Test title with bug",
-    "XmlPath": "TestFunction.xml",
-    "PrependOperationWithRoutePrefix": true
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft": "Warning"
+    }
   }
 }
