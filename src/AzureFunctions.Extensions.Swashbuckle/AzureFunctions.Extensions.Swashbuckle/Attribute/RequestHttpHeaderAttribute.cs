@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
@@ -7,8 +7,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
     {
         public RequestHttpHeaderAttribute(string headerName, bool isRequired = false)
         {
-            HeaderName = headerName;
-            IsRequired = isRequired;
+            this.HeaderName = headerName;
+            this.IsRequired = isRequired;
         }
 
         public string HeaderName { get; }

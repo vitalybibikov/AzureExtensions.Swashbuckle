@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
@@ -7,7 +7,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
     {
         public SupportedRequestFormatAttribute(string mediaType)
         {
-            MediaType = mediaType;
+            this.MediaType = mediaType;
         }
 
         public string MediaType { get; }

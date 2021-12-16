@@ -1,7 +1,5 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using Microsoft.Azure.Functions.Worker.Http;
 
 
@@ -22,7 +20,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var result = requestMessage.CreateResponse(HttpStatusCode.OK);
             result.WriteString(document);
-            result.Headers.Add("Content-Type", "application/json charset=utf-8");
+            result.Headers.Add("Content-Type", "application/json; charset=utf-8");
             return result;
 
         }
@@ -40,7 +38,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var result = requestMessage.CreateResponse(HttpStatusCode.OK);
             result.WriteString(document);
-            result.Headers.Add("Content-Type", "application/json charset=utf-8");
+            result.Headers.Add("Content-Type", "application/json; charset=utf-8");
             return result;
         }
 

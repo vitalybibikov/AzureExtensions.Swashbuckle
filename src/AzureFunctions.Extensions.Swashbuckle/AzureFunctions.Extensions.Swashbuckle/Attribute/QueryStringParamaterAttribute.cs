@@ -1,5 +1,5 @@
-using Microsoft.OpenApi.Any;
 using System;
+using Microsoft.OpenApi.Any;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 
@@ -13,21 +13,21 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 
         {
 
-            Initialise(name, description);
-            Example = new OpenApiNull();
+            this.Initialize(name, description);
+            this.Example = new OpenApiNull();
         }
 
         public QueryStringParameterAttribute(string name, string description, string example)
         {
 
-            Initialise(name, description);
-            DataType = typeof(string);
-            Example = new OpenApiString(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(string);
+            this.Example = new OpenApiString(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, int example)
         {
-            Initialise(name, description);
+            Initialize(name, description);
             DataType = typeof(int);
             Example = new OpenApiInteger(example);
         }
@@ -35,42 +35,42 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         public QueryStringParameterAttribute(string name, string description, long example)
         {
 
-            Initialise(name, description);
+            Initialize(name, description);
             DataType = typeof(long);
             Example = new OpenApiLong(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, double example)
         {
-            Initialise(name, description);
+            Initialize(name, description);
             Example = new OpenApiDouble(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, float example)
         { 
-            Initialise(name, description);
+            Initialize(name, description);
             DataType = typeof(float);
             Example = new OpenApiFloat(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, byte example)
         {
-            Initialise(name, description);
+            Initialize(name, description);
             DataType = typeof(byte);
             Example = new OpenApiByte(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, bool example)
         {
-            Initialise(name, description);
+            Initialize(name, description);
             DataType = typeof(bool);
             Example = new OpenApiBoolean(example);
         }
 
-        private void Initialise(string name, string description)
+        private void Initialize(string name, string description)
         {
-            Name = name;
-            Description = description;
+            this.Name = name;
+            this.Description = description;
         }
 
         #region public properties
@@ -82,7 +82,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         public IOpenApiAny Example { get; }
 
         #endregion
-
     }
 
 }

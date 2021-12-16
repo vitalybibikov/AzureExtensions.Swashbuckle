@@ -1,12 +1,12 @@
-﻿using System.IO;
+using System.IO;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     public sealed class SwashBuckleClient : ISwashBuckleClient
     {
-        private readonly SwashbuckleConfig _config;
+        private readonly ISwashbuckleConfig _config;
 
-        public SwashBuckleClient(SwashbuckleConfig config)
+        public SwashBuckleClient(ISwashbuckleConfig config)
         {
             _config = config;
         }

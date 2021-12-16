@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 {
@@ -32,7 +33,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
-            IOutputFormatter outputFormatter)
+            IOutputFormatter outputFormatter
+            )
         {
             _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
@@ -51,20 +53,20 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     continue;
 
                 var functionAttr =
-                    (FunctionAttribute) methodInfo.GetCustomAttribute(typeof(FunctionAttribute), false);
+                    (FunctionAttribute)methodInfo.GetCustomAttribute(typeof(FunctionAttribute), false);
                 var apiExplorerSettingsAttribute =
                     (ApiExplorerSettingsAttribute) methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute),
                         false) ??
                     (ApiExplorerSettingsAttribute) methodInfo.DeclaringType.GetCustomAttribute(
                         typeof(ApiExplorerSettingsAttribute), false);
 
-                /*
-                var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
-                    ? string.Empty
-                    : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
-                */
 
-                var prefix = "";
+                //var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
+                //    ? string.Empty
+                //    : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
+
+
+                var prefix = "api/";
 
                 string route;
 
@@ -134,7 +136,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         }
 
         public ApiDescriptionGroupCollection ApiDescriptionGroups { get; }
-
         private bool TryGetHttpTrigger(MethodInfo methodInfo, out HttpTriggerAttribute triggerAttribute)
         {
             triggerAttribute = null;
@@ -298,8 +299,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                 var requestBodyTypeAttribute =
                     parameter.GetCustomAttribute(typeof(RequestBodyTypeAttribute)) as RequestBodyTypeAttribute;
 
-                if ((parameter.ParameterType == typeof(HttpRequestMessage) ||
-                     parameter.ParameterType == typeof(HttpRequest))
+                if ((parameter.ParameterType == typeof(HttpRequestMessage)
+                     || parameter.ParameterType == typeof(HttpRequest)
+                     || parameter.ParameterType == typeof(HttpRequestData))
+                     || parameter.ParameterType == typeof(FunctionContext)
                     && requestBodyTypeAttribute == null)
                 {
                     continue;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
@@ -16,8 +16,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         /// <param name="description">Model description</param>
         public RequestBodyTypeAttribute(Type bodyType, string description)
         {
-            Type = bodyType;
-            Description = description;
+            this.Type = bodyType;
+            this.Description = description;
         }
 
         /// <summary>

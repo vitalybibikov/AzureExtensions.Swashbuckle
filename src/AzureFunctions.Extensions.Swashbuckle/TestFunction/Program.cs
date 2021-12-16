@@ -1,15 +1,8 @@
-using System.IO;
-using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
 using Synigo.OneApi.Core.Functions.Extensions;
-using Synigo.OneApi.Core.Functions.Middleware;
-using Synigo.OneApi.Storage;
 using System;
 using AzureFunctions.Extensions.Swashbuckle;
 using System.Reflection;
@@ -21,7 +14,7 @@ using System.Collections.Generic;
 
 namespace TestFunction
 {
-    public class Program
+    public static class Program
     {
 
         public static void Main(string[] args)
@@ -43,13 +36,9 @@ namespace TestFunction
                     //exception middleware form synigo.openapi.core.functions
                     workerApplication.UseOneApiExceptionMiddleware();
                 })
-                .ConfigureServices(service => ConfigureServices(service));
-
-            Console.WriteLine("BOEM");
-            return hostBuilder;
-
-            hostBuilder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
-            {
+                .ConfigureServices(service => ConfigureServices(service))
+                .AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+                {
                 opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
                 opts.AddCodeParameter = true;
                 opts.PrependOperationWithRoutePrefix = true;
@@ -112,7 +101,7 @@ namespace TestFunction
         }
         internal static void ConfigureServices(IServiceCollection services)
         {
-
+            services.UseOneApiGenerateHttpResponseData();
         }
     }
 }
