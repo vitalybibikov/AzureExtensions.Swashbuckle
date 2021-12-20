@@ -12,14 +12,12 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         public QueryStringParameterAttribute(string name, string description)
 
         {
-
             this.Initialize(name, description);
             this.Example = new OpenApiNull();
         }
 
         public QueryStringParameterAttribute(string name, string description, string example)
         {
-
             this.Initialize(name, description);
             this.DataType = typeof(string);
             this.Example = new OpenApiString(example);

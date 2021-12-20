@@ -1,4 +1,5 @@
 using System.IO;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
@@ -8,7 +9,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         string GetSwaggerOAuth2RedirectContent();
         string GetSwaggerUIContent(string swaggerUrl);
         Stream GetSwaggerYamlDocument(string host, string documentName = "v1");
-        void Initialize();
+        void Initialize(IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider);
         string RoutePrefix { get; }
     }
 }

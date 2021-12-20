@@ -9,6 +9,5 @@
         public string Version { get; set; } = "v1";
 
         public string Description { get; set; } = "Swagger document by Swashbuckle";
-
     }
 }

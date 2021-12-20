@@ -4,7 +4,6 @@ using Microsoft.OpenApi.Any;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
 {
-    //todo: Remove with the new version of Swachbuckle
     public static class JsonMapper
     {
         public static IOpenApiAny CreateFromJson(string str)

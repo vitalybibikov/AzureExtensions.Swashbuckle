@@ -18,7 +18,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleStartupExtension
     {
-      
         public static IHostBuilder  AddSwashBuckle(
             this IHostBuilder builder,
             Assembly assembly,
@@ -60,7 +59,17 @@ namespace AzureFunctions.Extensions.Swashbuckle
             services.AddSingleton<ISwashbuckleConfig, SwashbuckleConfig>();
             services.AddSingleton<ISwashBuckleClient, SwashBuckleClient>();
 
+            services.InitializeSwashbuckleConfig();
+
             return services;
+        }
+
+        private static void InitializeSwashbuckleConfig(this IServiceCollection services)
+        {
+            var providers = services.BuildServiceProvider();
+            var config = providers.GetRequiredService<ISwashbuckleConfig>();
+            var description = providers.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
+            config.Initialize(description);
         }
     }
 }

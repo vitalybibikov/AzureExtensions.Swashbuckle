@@ -21,6 +21,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
     public sealed class SwashbuckleConfig : ISwashbuckleConfig
     {
+        private static ServiceProvider serviceProvider;
+
         private const string ZippedResources = "EmbededResources.resources.zip";
         private const string IndexHtmlName = "index.html";
         private const string SwaggerUiName = "swagger-ui.css";
@@ -45,25 +47,19 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             return indexHtml;
         });
 
-        private readonly IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider;
-
+        private IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider;
 
         private readonly Lazy<string> indexHtmlLazy;
         private readonly Lazy<string> oauth2RedirectLazy;
         private readonly SwaggerDocOptions swaggerOptions;
         private readonly string xmlPath;
-        private ServiceProvider serviceProvider;
 
         public SwashbuckleConfig(
-            IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
             SwaggerDocOptions swaggerDocOptions,
             SwashBuckleStartupConfig startupConfig)
         {
-           
-            this.apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
             this.swaggerOptions = swaggerDocOptions;
 
-            Initialize();
             if (!string.IsNullOrWhiteSpace(this.swaggerOptions.XmlPath))
             {
                 var binPath = Path.GetDirectoryName(startupConfig.Assembly.Location);
@@ -98,9 +94,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         public string RoutePrefix => "api";
 
-        public void Initialize()
+        public void Initialize(IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider)
         {
-
+            this.apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
             var services = new ServiceCollection();
 
             services.AddSingleton(this.apiDescriptionGroupCollectionProvider);
@@ -141,8 +137,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
             serviceProvider = services.BuildServiceProvider(true);
         }
-
-
 
         public string GetSwaggerOAuth2RedirectContent()
         {
