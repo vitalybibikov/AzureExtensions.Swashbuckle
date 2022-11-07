@@ -190,3 +190,13 @@ AzureFunctions.Extensions.Swashbuckle can include xml document file.
     "XmlPath": "TestFunction.xml"
   }
 ```
+
+Alternatively you can add this section to your host.json
+
+```json
+  "extensions": {
+    "Swashbuckle": {
+      "XmlPath": "TestFunction.xml"
+    }
+  }
+```
