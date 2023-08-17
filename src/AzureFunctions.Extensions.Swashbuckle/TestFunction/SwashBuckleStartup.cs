@@ -1,19 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TestFunction;
-using TestFunction.CustomFilterExample;
 
-[assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
-
+[assembly: FunctionsStartup(typeof(SwashBuckleStartup))]
 namespace TestFunction
 {
     internal class SwashBuckleStartup : FunctionsStartup
@@ -21,13 +18,13 @@ namespace TestFunction
         public override void Configure(IFunctionsHostBuilder builder)
         {
             //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), swaggerDocOptions =>
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
-                opts.AddCodeParameter = true;
-                opts.PrependOperationWithRoutePrefix = true;
-                opts.XmlPath = "TestFunction.xml";
-                opts.Documents = new[]
+                swaggerDocOptions.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
+                swaggerDocOptions.AddCodeParameter = true;
+                swaggerDocOptions.PrependOperationWithRoutePrefix = true;
+                swaggerDocOptions.XmlPath = "TestFunction.xml";
+                swaggerDocOptions.Documents = new[]
                 {
                     new SwaggerDocument
                     {
@@ -44,20 +41,25 @@ namespace TestFunction
                         Version = "v2"
                     }
                 };
-                opts.Title = "Swagger Test";
+                swaggerDocOptions.Title = "Swagger Test";
                 //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
-                opts.ConfigureSwaggerGen = x =>
+                swaggerDocOptions.ConfigureSwaggerGen = swaggerGenOptions =>
                 {
                     //custom operation example
-                    x.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
+                    swaggerGenOptions.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
                         ? methodInfo.Name
                         : new Guid().ToString());
+
+                    // enable polymorphism for models
+                    swaggerGenOptions.UseOneOfForPolymorphism();
+                    // let swagger know what the discriminator property's name is
+                    swaggerGenOptions.SelectDiscriminatorNameUsing(_ => "$type");
 
                     //custom filter example
                     //x.DocumentFilter<RemoveSchemasFilter>();
 
                     //oauth2
-                    x.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                    swaggerGenOptions.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                     {
                         Type = SecuritySchemeType.OAuth2,
                         Flows = new OpenApiOAuthFlows
@@ -76,8 +78,8 @@ namespace TestFunction
                 };
 
                 // set up your client ID if your API is protected
-                opts.ClientId = "your.client.id";
-                opts.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
+                swaggerDocOptions.ClientId = "your.client.id";
+                swaggerDocOptions.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
 
             });
         }

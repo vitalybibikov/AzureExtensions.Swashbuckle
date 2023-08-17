@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
@@ -148,6 +149,18 @@ namespace TestFunction
             }
 
             return new NoContentResult();
+        }
+
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [FunctionName("TestShape")]
+        [SupportedRequestFormat("application/json")]
+        public async Task<IActionResult> TestShape(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/shape")]
+            [RequestBodyType(typeof(Shape), "Shape")]
+            HttpRequestMessage httpRequest,
+            [SwaggerIgnore] CancellationToken cancellationToken = default)
+        {
+            return await Task.FromResult<IActionResult>(new OkResult());
         }
     }
 }

@@ -4,6 +4,43 @@
         <name>TestFunction</name>
     </assembly>
     <members>
+        <member name="T:TestFunction.Models.Shape">
+            <summary>
+            An abstract class for different shapes
+            <remarks>
+            $type: ["Circle", "Square", "Rectangle"]
+            </remarks>
+            </summary>
+        </member>
+        <member name="P:TestFunction.Models.Shape.Name">
+            <summary>
+            A globally unique identifier
+            </summary>
+        </member>
+        <member name="T:TestFunction.Models.Circle">
+            <summary>
+            Circle
+            <remarks>
+             $type: "Circle"
+            </remarks>
+            </summary>
+        </member>
+        <member name="T:TestFunction.Models.Square">
+            <summary>
+            Square
+            <remarks>
+             $type: "Square"
+            </remarks>
+            </summary>
+        </member>
+        <member name="T:TestFunction.Models.Rectangle">
+            <summary>
+            Square
+            <remarks>
+             $type: "Rectangle"
+            </remarks>
+            </summary>
+        </member>
         <member name="T:TestFunction.Models.TestModel">
             <summary>
             Some model
