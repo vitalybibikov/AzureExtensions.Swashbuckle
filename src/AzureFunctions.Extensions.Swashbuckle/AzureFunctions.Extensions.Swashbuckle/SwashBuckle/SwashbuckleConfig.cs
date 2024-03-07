@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -123,6 +123,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
 
             services.AddSingleton<IWebHostEnvironment>(new FunctionHostingEnvironment());
+
+            if (_swaggerOptions.AddNewtonsoftSupport)
+            {
+                services.AddSwaggerGenNewtonsoftSupport();
+            }
 
             services.AddSwaggerGen(options =>
             {
