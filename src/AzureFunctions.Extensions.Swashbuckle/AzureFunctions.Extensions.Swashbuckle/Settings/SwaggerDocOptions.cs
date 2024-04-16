@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.OpenApi;
@@ -27,6 +27,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
         public string ClientId { get; set; } = "";
 
         public string OAuth2RedirectPath { get; set; } = "";
+
+        public bool AddNewtonsoftSupport { get; set; } = false;
 
     }
 }
