@@ -1,5 +1,5 @@
 
-# AzureExtensions.Swashbuckle
+# AzureExtensions.Swashbuckle v4.0.00
 
 OpenAPI 2/3 implementation based on Swashbuckle(Swagger) tooling for API's built with Azure Functions 
 
