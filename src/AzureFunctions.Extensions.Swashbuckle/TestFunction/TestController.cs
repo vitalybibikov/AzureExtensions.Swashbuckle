@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Newtonsoft.Json;
 using TestFunction.Models;
 
@@ -18,9 +17,8 @@ namespace TestFunction
     [ApiExplorerSettings(GroupName = "testee")]
     public class TestController
     {
-
         [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
-        [FunctionName("TestGetWithExamples")]
+        [Function("TestGetWithExamples")]
         [QueryStringParameter("colour", "The colour of the bike", "Red", Required = true)]
         [QueryStringParameter("wheelsize", "Size of wheel", 26, Required = true)]
         [QueryStringParameter("used", "Must be used", false, Required = false)]
@@ -32,7 +30,7 @@ namespace TestFunction
 
 
         [ProducesResponseType(typeof(TestModel[]), (int)HttpStatusCode.OK)]
-        [FunctionName("TestGets")]
+        [Function("TestGets")]
         [QueryStringParameter("expand", "it is expand parameter", DataType = typeof(int), Required = true)]
         public async Task<IActionResult> Gets([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")]
             HttpRequest request)
@@ -48,7 +46,7 @@ namespace TestFunction
         /// <remarks>Awesomeness!</remarks>
         /// <response code="200">Product created</response>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
-        [FunctionName("TestGet")]
+        [Function("TestGet")]
         [ApiExplorerSettings(GroupName = "v1")]
         public Task<IActionResult> Get(
             int id,
@@ -66,7 +64,7 @@ namespace TestFunction
         /// <remarks>Awesomeness!</remarks>
         /// <response code="200">Product created</response>
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
-        [FunctionName("TestGetv2")]
+        [Function("TestGetv2")]
         [ApiExplorerSettings(GroupName = "v2")]
         public Task<IActionResult> Get2(
             int id,
@@ -78,7 +76,7 @@ namespace TestFunction
 
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [QueryStringParameter("name", "this is name", DataType = typeof(string), Required = true)]
-        [FunctionName("TestGetCat")]
+        [Function("TestGetCat")]
         public Task<IActionResult> GetCat(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "cat/{id}/{testId?}")]
             HttpRequest request, int id, int? testId)
@@ -88,7 +86,7 @@ namespace TestFunction
 
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.OK)]
         [QueryStringParameter("pageSorting", "pageSorting", DataType = typeof(IEnumerable<string>), Required = false)]
-        [FunctionName("TestGetSomethingWithArray")]
+        [Function("TestGetSomethingWithArray")]
         public Task<IActionResult> GetSomethingWithArray(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "arraytest")]
             HttpRequest request)
@@ -98,7 +96,7 @@ namespace TestFunction
         }
 
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
-        [FunctionName("TestAdd")]
+        [Function("TestAdd")]
         public Task<IActionResult> Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test")]
             TestModel testModel)
         {
@@ -106,7 +104,7 @@ namespace TestFunction
         }
 
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
-        [FunctionName("TestRequestBodyTypePresented")]
+        [Function("TestRequestBodyTypePresented")]
         public async Task<IActionResult> RequestBodyTypePresented(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "testandget/{id}")]
             [RequestBodyType(typeof(TestModel), "testmodel")]
@@ -128,7 +126,7 @@ namespace TestFunction
 
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [RequestHttpHeader("x-ms-session-id", true)]
-        [FunctionName("TestUpload")]
+        [Function("TestUpload")]
         [RequestHttpHeader("x-ms-session-id", true)]
         [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
         public async Task<IActionResult> TestUpload(
@@ -136,16 +134,16 @@ namespace TestFunction
             HttpRequestMessage httpRequest)
 
         {
-            var data = await httpRequest.Content.ReadAsMultipartAsync();
+            //var data = await httpRequest.Content.ReadAsMultipartAsync();
 
-            if (data != null && data.Contents != null)
-            {
-                foreach (var content in data.Contents)
-                {
-                    var result = await content.ReadAsStringAsync();
-                    return new OkObjectResult(result.Length);
-                }
-            }
+            //if (data != null && data.Contents != null)
+            //{
+            //    foreach (var content in data.Contents)
+            //    {
+            //        var result = await content.ReadAsStringAsync();
+            //        return new OkObjectResult(result.Length);
+            //    }
+            //}
 
             return new NoContentResult();
         }

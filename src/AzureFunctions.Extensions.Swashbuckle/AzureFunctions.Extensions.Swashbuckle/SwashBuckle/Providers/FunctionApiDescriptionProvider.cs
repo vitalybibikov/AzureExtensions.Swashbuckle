@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.AspNetCore.Http;
@@ -14,8 +15,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,8 +33,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             SwashBuckleStartupConfig startupConfig,
             IModelMetadataProvider modelMetadataProvider,
             ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider,
-            IOutputFormatter outputFormatter,
-            IOptions<HttpOptions> httpOptions)
+            IOutputFormatter outputFormatter
+            )
         {
             _swaggerDocOptions = functionsOptions.Value;
             _modelMetadataProvider = modelMetadataProvider;
@@ -44,27 +44,30 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             var apiDescGroups = new Dictionary<string, List<ApiDescription>>();
             var methods = startupConfig.Assembly.GetTypes()
                 .SelectMany(t => t.GetMethods())
-                .Where(m => m.GetCustomAttributes(typeof(FunctionNameAttribute), false).Any())
+                .Where(m => m.GetCustomAttributes(typeof(FunctionAttribute), false).Any())
                 .ToArray();
 
             foreach (var methodInfo in methods)
             {
                 if (!TryGetHttpTrigger(methodInfo, out var triggerAttribute))
+                {
                     continue;
+                }
+              
 
                 var functionAttr =
-                    (FunctionNameAttribute) methodInfo.GetCustomAttribute(typeof(FunctionNameAttribute), false);
+                    (FunctionAttribute) methodInfo.GetCustomAttribute(typeof(FunctionAttribute), false);
                 var apiExplorerSettingsAttribute =
                     (ApiExplorerSettingsAttribute) methodInfo.GetCustomAttribute(typeof(ApiExplorerSettingsAttribute),
                         false) ??
                     (ApiExplorerSettingsAttribute) methodInfo.DeclaringType.GetCustomAttribute(
                         typeof(ApiExplorerSettingsAttribute), false);
 
-                var prefix = string.IsNullOrWhiteSpace(httpOptions.Value.RoutePrefix)
+                var prefix = string.IsNullOrWhiteSpace(functionsOptions.Value.RoutePrefix)
                     ? string.Empty
-                    : $"{httpOptions.Value.RoutePrefix.TrimEnd('/')}/";
+                    : $"{functionsOptions.Value.RoutePrefix.TrimEnd('/')}/";
 
-                string route;
+                string route = null;
 
                 if (_swaggerDocOptions.PrependOperationWithRoutePrefix)
                 {
@@ -84,10 +87,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                 var routes = new List<(string Route, string RemoveParamName)>();
 
                 var regex = new Regex("/\\{(?<paramName>\\w+)\\?\\}$");
-                var match = regex.Match(route);
+                var match = regex.Match(route!);
 
                 var routeParamRemoveRegex = new Regex(":[a-zA-Z]+(\\(.*\\))?");
-                route = routeParamRemoveRegex.Replace(route, "");
+                route = routeParamRemoveRegex.Replace(route!, "");
                 
                 if (match.Success && match.Captures.Count == 1)
                 {
@@ -148,7 +151,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
         }
 
         private ApiDescription CreateDescription(MethodInfo methodInfo, string route, int routeIndex,
-            FunctionNameAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
+            FunctionAttribute functionAttr, ApiExplorerSettingsAttribute apiExplorerSettingsAttr,
             string verb, AuthorizationLevel authorizationLevel, string removeParamName = null, bool manyVerbs = false)
         {
             string controllerName;

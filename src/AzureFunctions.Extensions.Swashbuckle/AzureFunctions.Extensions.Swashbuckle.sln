@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctions.Extensions.Swashbuckle", "AzureFunctions.Extensions.Swashbuckle\AzureFunctions.Extensions.Swashbuckle.csproj", "{1E41B7D0-91CC-4232-88E8-ED5330EDB7BF}"
 EndProject

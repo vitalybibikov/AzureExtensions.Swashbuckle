@@ -30,5 +30,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
 
         public bool AddNewtonsoftSupport { get; set; } = false;
 
+        public string RoutePrefix { get; set; } = "";
     }
 }

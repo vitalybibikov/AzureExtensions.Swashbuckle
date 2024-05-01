@@ -7,18 +7,12 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using AzureFunctions.Extensions.Swashbuckle.FunctionBinding;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
@@ -29,9 +23,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
-    [Extension("Swashbuckle", "Swashbuckle")]
-    public sealed class SwashbuckleConfig : IExtensionConfigProvider,
-        IAsyncConverter<HttpRequestMessage, HttpResponseMessage>
+    public sealed class SwashbuckleConfig
     {
         private const string ZippedResources = "EmbededResources.resources.zip";
         private const string IndexHtmlName = "index.html";
@@ -57,7 +49,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         });
 
         private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
-        private readonly HttpOptions _httpOptions;
 
         private readonly Lazy<string> _indexHtmlLazy;
         private readonly Lazy<string> _oauth2RedirectLazy;
@@ -68,12 +59,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
         public SwashbuckleConfig(
             IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
             IOptions<SwaggerDocOptions> swaggerDocOptions,
-            SwashBuckleStartupConfig startupConfig,
-            IOptions<HttpOptions> httpOptions)
+            SwashBuckleStartupConfig startupConfig)
         {
             _apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
             _swaggerOptions = swaggerDocOptions.Value;
-            _httpOptions = httpOptions.Value;
 
             if (!string.IsNullOrWhiteSpace(_swaggerOptions.XmlPath))
             {
@@ -104,20 +93,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 using var reader = new StreamReader(entryStream);
                 return reader.ReadToEnd();
             });
+
+            this.Initialize();
         }
 
-        public string RoutePrefix => _httpOptions.RoutePrefix;
+        public string RoutePrefix => _swaggerOptions.RoutePrefix;
 
-        public Task<HttpResponseMessage> ConvertAsync(HttpRequestMessage input, CancellationToken cancellationToken)
+        public void Initialize()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Initialize(ExtensionConfigContext context)
-        {
-            context.AddBindingRule<SwashBuckleClientAttribute>()
-                .Bind(new SwashBuckleClientBindingProvider(this));
-
             var services = new ServiceCollection();
 
             services.AddSingleton(_apiDescriptionGroupCollectionProvider);
@@ -163,8 +146,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
             _serviceProvider = services.BuildServiceProvider(true);
         }
-
-
 
         public string GetSwaggerOAuth2RedirectContent()
         {

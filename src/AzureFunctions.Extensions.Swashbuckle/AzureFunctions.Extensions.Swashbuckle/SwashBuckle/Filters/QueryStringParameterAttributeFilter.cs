@@ -25,7 +25,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 
                 foreach (var attribute in attributes)
                 {
-                    // var attributeTypeName = new OpenApiSchema {Type = "string"};
                     var apiParameter = new OpenApiParameter
                     {
                         Name = attribute.Name,
