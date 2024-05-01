@@ -21,7 +21,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 - Ability to create multiple versions of documents, example added.
 - Added examples of a custom filter, improved test application
 
-https://www.nuget.org/packages/AzureExtensions.Swashbuckle/3.3.1-beta
+https://www.nuget.org/packages/AzureExtensions.Swashbuckle/4.0.0-beta
 
 
 ------------------------------
