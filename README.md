@@ -14,7 +14,9 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 - Updated to UI v5.17.3
 - Updated to Swagger 5.6.5
 - Updated docs
-- Considering removing support of NewtonJson 
+- Considering removing support of NewtonJson
+
+  https://www.nuget.org/packages/AzureExtensions.Swashbuckle/4.0.0-beta
 ------------------------------
 3.3.1-beta
 
