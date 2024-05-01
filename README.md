@@ -5,7 +5,16 @@ OpenAPI 2/3 implementation based on Swashbuckle(Swagger) tooling for API's built
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions
 
-
+------------------------------
+4.0.0-beta
+- just remebering what the heck is going om here
+- Updated to v4 Functions
+- Updated to .NET 8
+- Updated to isolated worker model (from now on it is going to be the only one that is supported, as inprocess is going to be deprecated)
+- Updated to UI v5.17.3
+- Updated to Swagger 5.6.5
+- Updated docs
+- Considering removing support of NewtonJson 
 ------------------------------
 3.3.1-beta
 
@@ -88,82 +97,154 @@ Package Manager : Install-Package AzureExtensions.Swashbuckle
 CLI : dotnet add package AzureExtensions.Swashbuckle
 ```
 
-2. Add startup class on your Functions project.
+2. Add Program.cs class on your Functions project.
+
+!!! Now you need to specify in option the RoutePrefix.
+
+            opts.RoutePrefix = "api";
+
+
 ```csharp
-[assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
-namespace YourAppNamespace
-{
-    internal class SwashBuckleStartup : IWebJobsStartup
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Hosting;
+using System.Reflection;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
+using AzureFunctions.Extensions.Swashbuckle;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+var host = new HostBuilder()
+    .ConfigureServices((hostContext, services) =>
     {
-        public void Configure(IWebJobsBuilder builder)
+        //Register the extension
+        services.AddSwashBuckle(opts =>
         {
-            //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
-
-        }
-    }
-}
-```
-
-or you can create a more defailed configuration like this:
-
-```
-        public void Configure(IWebJobsBuilder builder)
-        {
-            //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts =>
+            // If you want to add Newtonsoft support insert next line
+            // opts.AddNewtonsoftSupport = true;
+            opts.RoutePrefix = "api";
+            opts.SpecVersion = OpenApiSpecVersion.OpenApi3_0;
+            opts.AddCodeParameter = true;
+            opts.PrependOperationWithRoutePrefix = true;
+            opts.XmlPath = "TestFunction.xml";
+            opts.Documents = new[]
             {
-                opts.SpecVersion = OpenApiSpecVersion.OpenApi2_0;
-                opts.AddCodeParameter = true;
-                opts.PrependOperationWithRoutePrefix = true;
-                opts.Documents = new []
+                new SwaggerDocument
                 {
-                    new SwaggerDocument
-                    {
-                        Name = "v1",
-                        Title = "Swagger document",
-                        Description = "Swagger test document",
-                        Version = "v2"
-                    }
-                };
-                opts.Title = "Swagger Test";
-                //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
-                opts.ConfigureSwaggerGen = (x =>
+                    Name = "v1",
+                    Title = "Swagger document",
+                    Description = "Swagger test document",
+                    Version = "v2"
+                },
+                new SwaggerDocument
                 {
-                    x.CustomOperationIds(apiDesc =>
+                    Name = "v2",
+                    Title = "Swagger document 2",
+                    Description = "Swagger test document 2",
+                    Version = "v2"
+                }
+            };
+            opts.Title = "Swagger Test";
+            //opts.OverridenPathToSwaggerJson = new Uri("http://localhost:7071/api/Swagger/json");
+            opts.ConfigureSwaggerGen = x =>
+            {
+                //custom operation example
+                x.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
+                    ? methodInfo.Name
+                    : new Guid().ToString());
+
+                //custom filter example
+                //x.DocumentFilter<RemoveSchemasFilter>();
+
+                //oauth2
+                x.AddSecurityDefinition("oauth2",
+                    new OpenApiSecurityScheme
                     {
-                        return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
-                            ? methodInfo.Name
-                            : new Guid().ToString();
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
+                        {
+                            Implicit = new OpenApiOAuthFlow
+                            {
+                                AuthorizationUrl = new Uri("https://your.idserver.net/connect/authorize"),
+                                Scopes = new Dictionary<string, string>
+                                {
+                                    { "api.read", "Access read operations" },
+                                    { "api.write", "Access write operations" }
+                                }
+                            }
+                        }
                     });
-                });
-            });
-        }
+            };
+
+            // set up your client ID if your API is protected
+            opts.ClientId = "your.client.id";
+            opts.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
+        });
+    })
+    .Build();
+
+host.Run();
+
 ```
 
 3. Add swagger and swagger ui endpoint functions on your project.
 
 ```csharp
-public static class SwaggerController
-{
-    [SwaggerIgnore]
-    [FunctionName("Swagger")]
-    public static Task<HttpResponseMessage> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/json")] HttpRequestMessage req,
-        [SwashBuckleClient]ISwashBuckleClient swashBuckleClient)
+    public class SwaggerController
     {
-        return Task.FromResult(swashBuckleClient.CreateSwaggerDocumentResponse(req));
-    }
+        private readonly ISwashBuckleClient swashBuckleClient;
 
-    [SwaggerIgnore]
-    [FunctionName("SwaggerUi")]
-    public static Task<HttpResponseMessage> Run2(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/ui")] HttpRequestMessage req,
-        [SwashBuckleClient]ISwashBuckleClient swashBuckleClient)
-    {
-        return Task.FromResult(swashBuckleClient.CreateSwaggerUIResponse(req, "swagger/json"));
+        public SwaggerController(ISwashBuckleClient swashBuckleClient)
+        {
+            this.swashBuckleClient = swashBuckleClient;
+        }
+
+        [SwaggerIgnore]
+        [Function("SwaggerJson")]
+        public async Task<HttpResponseData> SwaggerJson(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/json")]
+            HttpRequestData  req)
+        {
+            return await this.swashBuckleClient.CreateSwaggerJsonDocumentResponse(req);
+        }
+
+        [SwaggerIgnore]
+        [Function("SwaggerYaml")]
+        public async Task<HttpResponseData> SwaggerYaml(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/yaml")]
+            HttpRequestData req)
+        {
+            return await this.swashBuckleClient.CreateSwaggerYamlDocumentResponse(req);
+        }
+
+        [SwaggerIgnore]
+        [Function("SwaggerUi")]
+        public async Task<HttpResponseData> SwaggerUi(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/ui")]
+            HttpRequestData req)
+        {
+            return await this.swashBuckleClient.CreateSwaggerUIResponse(req, "swagger/json");
+        }
+
+        /// <summary>
+        /// This is only needed for OAuth2 client. This redirecting document is normally served
+        /// as a static content. Functions don't provide this out of the box, so we serve it here.
+        /// Don't forget to set OAuth2RedirectPath configuration option to reflect this route.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="swashBuckleClient"></param>
+        /// <returns></returns>
+        [SwaggerIgnore]
+        [Function("SwaggerOAuth2Redirect")]
+        public async Task<HttpResponseData> SwaggerOAuth2Redirect(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger/oauth2-redirect")]
+            HttpRequestData req)
+        {
+            return await this.swashBuckleClient.CreateSwaggerOAuth2RedirectResponse(req);
+        }
     }
-}
 ```
 
 4. Open Swagger UI URL in your browser.
