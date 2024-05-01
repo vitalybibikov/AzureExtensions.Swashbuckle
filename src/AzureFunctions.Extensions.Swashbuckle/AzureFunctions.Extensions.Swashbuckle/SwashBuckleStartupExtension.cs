@@ -1,58 +1,51 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleStartupExtension
     {
-        [Obsolete("Please, use FunctionsStartup instead, will be deprecated soon")]
-        public static IWebJobsBuilder AddSwashBuckle(
-            this IWebJobsBuilder builder,
+        public static IFunctionsWorkerApplicationBuilder AddSwashBuckle(
+            this IFunctionsWorkerApplicationBuilder builder,
             Assembly assembly,
             Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
-            builder.Services.AddSwashBuckle(assembly, configureDocOptionsAction, builder);
-            return builder;
-        }
-
-        public static IFunctionsHostBuilder  AddSwashBuckle(
-            this IFunctionsHostBuilder  builder,
-            Assembly assembly,
-            Action<SwaggerDocOptions> configureDocOptionsAction = null)
-        {
-            builder.Services.AddSwashBuckle(assembly, configureDocOptionsAction);
+            builder.Services.AddSwashBuckle(configureDocOptionsAction);
             return builder;
         }
 
         public static IServiceCollection AddSwashBuckle(
             this IServiceCollection services,
-            Assembly assembly,
-            Action<SwaggerDocOptions> configureDocOptionsAction = null, 
-            IWebJobsBuilder webJobsBuilder = null)
+            Action<SwaggerDocOptions> configureDocOptionsAction = null)
         {
-            webJobsBuilder ??= services.AddWebJobs(_ => { });
+            services.Configure(configureDocOptionsAction);
 
-            webJobsBuilder.AddExtension<SwashbuckleConfig>()
-                .BindOptions<SwaggerDocOptions>()
-                .ConfigureOptions<SwaggerDocOptions>((configuration, section, options) => configureDocOptionsAction?.Invoke(options));
-
+            services.AddSingleton<ISwashBuckleClient, SwashBuckleClient>();
+            services.AddSingleton<SwashbuckleConfig>();
             services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
             services.AddSingleton(new SwashBuckleStartupConfig
             {
-                Assembly = assembly
+                Assembly = Assembly.GetEntryAssembly()
             });
 
-            var formatter = new SystemTextJsonOutputFormatter(new JsonSerializerOptions());
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            };
+
+            var formatter = new SystemTextJsonOutputFormatter(jsonOptions);
             services.AddSingleton<IOutputFormatter>(formatter);
             services.AddSingleton<IApiDescriptionGroupCollectionProvider, FunctionApiDescriptionProvider>();
 

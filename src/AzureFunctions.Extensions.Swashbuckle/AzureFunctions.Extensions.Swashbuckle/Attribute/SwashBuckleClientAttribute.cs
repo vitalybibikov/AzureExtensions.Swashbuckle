@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.Azure.WebJobs.Description;
+using System;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
-    [Binding]
+    //[Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SwashBuckleClientAttribute : System.Attribute
     {

@@ -2,17 +2,13 @@ using Microsoft.OpenApi.Any;
 using System;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
-
 {
-
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
     public class QueryStringParameterAttribute : System.Attribute
 
-    { 
+    {
         public QueryStringParameterAttribute(string name, string description)
-
         {
-
             Initialise(name, description);
             Example = new OpenApiNull();
         }
@@ -47,7 +43,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         }
 
         public QueryStringParameterAttribute(string name, string description, float example)
-        { 
+        {
             Initialise(name, description);
             DataType = typeof(float);
             Example = new OpenApiFloat(example);
