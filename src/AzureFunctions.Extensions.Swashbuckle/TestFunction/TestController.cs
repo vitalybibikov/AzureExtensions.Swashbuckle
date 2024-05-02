@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Newtonsoft.Json;
 using TestFunction.Models;
 
 namespace TestFunction
@@ -113,12 +113,10 @@ namespace TestFunction
         {
             if (httpRequest.Method.Equals("post", StringComparison.OrdinalIgnoreCase))
             {
-                using (var reader = new StreamReader(httpRequest.Body))
-                {
-                    var json = await reader.ReadToEndAsync();
-                    var testModel = JsonConvert.DeserializeObject<TestModel>(json);
-                    return new CreatedResult("", testModel);
-                }
+                using var reader = new StreamReader(httpRequest.Body);
+                var json = await reader.ReadToEndAsync();
+                var testModel = JsonSerializer.Deserialize<TestModel>(json);
+                return new CreatedResult("", testModel);
             }
 
             return new OkResult();
