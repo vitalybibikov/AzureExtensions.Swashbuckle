@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Swagger Swashbuckle AzureFunctions openapi openapi3</PackageTags>
+    <PackageTags>Swagger Swashbuckle Azure Functions openapi openapi3 isolated worker</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Open.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
