@@ -1,6 +1,8 @@
 
 # AzureExtensions.Swashbuckle v4.0.0
 
+### (Searching for collaborators!)
+
 OpenAPI 2/3 implementation based on Swashbuckle(Swagger) tooling for API's built with Azure Functions 
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using isolated worker model
