@@ -7,7 +7,7 @@ This product aims to easily provide Swagger and Swagger UI of APIs created in Az
 
 
 ------------------------------
-4.0.1-beta
+4.0.1
 
 - Fixed some minor issues
 - Updated to new language features
