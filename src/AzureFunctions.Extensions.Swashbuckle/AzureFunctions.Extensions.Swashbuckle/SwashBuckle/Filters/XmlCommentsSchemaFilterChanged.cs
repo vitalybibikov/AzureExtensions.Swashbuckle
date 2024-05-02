@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper;
@@ -9,27 +9,27 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 {
     public class XmlCommentsSchemaFilterChanged : ISchemaFilter
     {
-        private readonly XPathNavigator _xmlNavigator;
+        private readonly XPathNavigator xmlNavigator;
 
         public XmlCommentsSchemaFilterChanged(XPathDocument xmlDoc)
         {
-            _xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
+            this.xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
         }
 
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            ApplyTypeTags(schema, context.Type);
+            this.ApplyTypeTags(schema, context.Type);
 
             if (context.MemberInfo != null && context.ParameterInfo == null)
             {
-                ApplyFieldOrPropertyTags(schema, context.MemberInfo);
+                this.ApplyFieldOrPropertyTags(schema, context.MemberInfo);
             }
         }
 
         private void ApplyTypeTags(OpenApiSchema schema, Type type)
         {
             var typeMemberName = XmlCommentsNodeNameHelper.GetMemberNameForType(type);
-            var typeSummaryNode = _xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{typeMemberName}']/summary");
+            var typeSummaryNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{typeMemberName}']/summary");
 
             if (typeSummaryNode != null)
             {
@@ -40,9 +40,12 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
         private void ApplyFieldOrPropertyTags(OpenApiSchema schema, MemberInfo fieldOrPropertyInfo)
         {
             var fieldOrPropertyMemberName = XmlCommentsNodeNameHelper.GetMemberNameForFieldOrProperty(fieldOrPropertyInfo);
-            var fieldOrPropertyNode = _xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{fieldOrPropertyMemberName}']");
+            var fieldOrPropertyNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{fieldOrPropertyMemberName}']");
 
-            if (fieldOrPropertyNode == null) return;
+            if (fieldOrPropertyNode == null)
+            {
+                return;
+            }
 
             var summaryNode = fieldOrPropertyNode.SelectSingleNode("summary");
             if (summaryNode != null)

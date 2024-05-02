@@ -2,19 +2,41 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>AzureExtensions.Swashbuckle</PackageId>
-    <Authors>vitalybibikov</Authors>
+    <Authors>Vitaly Bibikov</Authors>
     <Description>Swagger and Swagger UI in Azure Functions by Swashbuckle</Description>
     <AssemblyName>AzureFunctions.Extensions.Swashbuckle</AssemblyName>
-    <Version>4.0.0-beta</Version>
+    <Version>4.0.1-beta</Version>
     <RootNamespace>AzureFunctions.Extensions.Swashbuckle</RootNamespace>
     <Copyright>vitalybibikov</Copyright>
     <PackageProjectUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vitalybibikov/azure-functions-extensions-swashbuckle</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Swagger Swashbuckle AzureFunctions webjobs extensions</PackageTags>
+    <PackageTags>Swagger Swashbuckle AzureFunctions openapi openapi3</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Open.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    <CodeAnalysisRuleSet>..\..\..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +60,23 @@
     <EmbeddedResource Include="EmbededResources\resources.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="nupkgs\**" />
+    <EmbeddedResource Remove="nupkgs\**" />
+    <None Remove="nupkgs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <AdditionalFiles Include="..\..\..\stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>

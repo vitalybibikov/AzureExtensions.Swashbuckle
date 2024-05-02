@@ -12,7 +12,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 
         public QueryStringParameterAttributeFilter(ISchemaGenerator schemaGenerator)
         {
-            this.schemaGenerator = schemaGenerator;
+            this.schemaGenerator = schemaGenerator ?? throw new ArgumentNullException(nameof(schemaGenerator));
         }
 
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
@@ -31,26 +31,26 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                         Description = attribute.Description,
                         In = ParameterLocation.Query,
                         Required = attribute.Required,
-                        Schema = schemaGenerator.GenerateSchema(attribute?.DataType, new SchemaRepository())
+                        Schema = this.schemaGenerator.GenerateSchema(attribute?.DataType, new SchemaRepository())
                     };
 
-
-                    switch (attribute.Example)
+                    if (attribute != null)
                     {
+                        switch (attribute.Example)
+                        {
+                            case OpenApiNull _:
+                                /* ignore */
+                                break;
 
-                        case OpenApiNull _:
-                            /* ignore */
-                            break;
-
-                        default:
-                            // set both examples
-                            apiParameter.Schema.Example = attribute.Example;
-                            apiParameter.Example = apiParameter.Schema.Example;
-                            break;
+                            default:
+                                // set both examples
+                                apiParameter.Schema.Example = attribute.Example;
+                                apiParameter.Example = apiParameter.Schema.Example;
+                                break;
+                        }
                     }
 
                     operation.Parameters.Add(apiParameter);
-
                 }
             }
         }

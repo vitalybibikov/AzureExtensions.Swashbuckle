@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Hosting
 {
-    internal class FunctionHostingEnvironment: IWebHostEnvironment
+    internal class FunctionHostingEnvironment : IWebHostEnvironment
     {
         public string ApplicationName { get; set; }
         public IFileProvider ContentRootFileProvider { get; set; }

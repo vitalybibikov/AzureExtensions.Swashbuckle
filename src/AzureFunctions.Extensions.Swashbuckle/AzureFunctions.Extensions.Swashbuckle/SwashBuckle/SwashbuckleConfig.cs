@@ -1,11 +1,5 @@
-using System;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Extensions;
@@ -34,62 +28,76 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 
         private static readonly Lazy<string> IndexHtml = new Lazy<string>(() =>
         {
-            var indexHtml = String.Empty;
+            var indexHtml = string.Empty;
             var assembly = GetAssembly();
 
             using var stream = assembly.GetResourceByName(ZippedResources);
-            using var archive = new ZipArchive(stream);
+            if (stream != null)
+            {
+                using var archive = new ZipArchive(stream);
 
-            indexHtml = LoadAndUpdateDocument(indexHtml, archive, IndexHtmlName);
-            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiName, "{style}");
-            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsName, "{bundle.js}");
-            indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsPresetName, "{standalone-preset.js}");
+                indexHtml = LoadAndUpdateDocument(indexHtml, archive, IndexHtmlName);
+                indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiName, "{style}");
+                indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsName, "{bundle.js}");
+                indexHtml = LoadAndUpdateDocument(indexHtml, archive, SwaggerUiJsPresetName, "{standalone-preset.js}");
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(stream), "Embedded data stream is null");
+            }
 
             return indexHtml;
         });
 
-        private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
+        private readonly IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider;
 
-        private readonly Lazy<string> _indexHtmlLazy;
-        private readonly Lazy<string> _oauth2RedirectLazy;
-        private readonly SwaggerDocOptions _swaggerOptions;
-        private readonly string _xmlPath;
-        private ServiceProvider _serviceProvider;
+        private readonly Lazy<string> indexHtmlLazy;
+        private readonly Lazy<string> oauth2RedirectLazy;
+        private readonly SwaggerDocOptions swaggerOptions;
+        private readonly string? xmlPath;
+        private ServiceProvider? serviceProvider;
 
         public SwashbuckleConfig(
             IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
             IOptions<SwaggerDocOptions> swaggerDocOptions,
             SwashBuckleStartupConfig startupConfig)
         {
-            _apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
-            _swaggerOptions = swaggerDocOptions.Value;
+            this.apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
+            this.swaggerOptions = swaggerDocOptions.Value;
 
-            if (!string.IsNullOrWhiteSpace(_swaggerOptions.XmlPath))
+            if (!string.IsNullOrWhiteSpace(this.swaggerOptions.XmlPath))
             {
                 var binPath = Path.GetDirectoryName(startupConfig.Assembly.Location);
+
+                if (string.IsNullOrEmpty(binPath))
+                {
+                    throw new ArgumentNullException(nameof(binPath), "Not found path to an xml directory");
+                }
+
                 var binDirectory = Directory.CreateDirectory(binPath);
                 var xmlBasePath = binDirectory?.Parent?.FullName;
+
                 if (xmlBasePath != null)
                 {
-                    var xmlPath = Path.Combine(xmlBasePath, _swaggerOptions.XmlPath);
+                    var path = Path.Combine(xmlBasePath, this.swaggerOptions.XmlPath);
 
-                    if (File.Exists(xmlPath))
+                    if (File.Exists(path))
                     {
-                        _xmlPath = xmlPath;
+                        this.xmlPath = path;
                     }
                 }
             }
 
-            _indexHtmlLazy = new Lazy<string>(
-                () => IndexHtml.Value.Replace("{title}", _swaggerOptions.Title));
+            this.indexHtmlLazy = new Lazy<string>(
+                () => IndexHtml.Value.Replace("{title}", this.swaggerOptions.Title));
 
-            _oauth2RedirectLazy = new Lazy<string>(() => {
+            this.oauth2RedirectLazy = new Lazy<string>(() =>
+            {
                 var assembly = GetAssembly();
                 using var stream = assembly.GetResourceByName(ZippedResources);
-                using var archive = new ZipArchive(stream);
+                using var archive = new ZipArchive(stream!);
                 var entry = archive.GetEntry(SwaggerOAuth2RedirectName);
-
-                using var entryStream = entry.Open();
+                using var entryStream = entry!.Open();
                 using var reader = new StreamReader(entryStream);
                 return reader.ReadToEnd();
             });
@@ -97,40 +105,40 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             this.Initialize();
         }
 
-        public string RoutePrefix => _swaggerOptions.RoutePrefix;
+        public string RoutePrefix => this.swaggerOptions.RoutePrefix;
 
         public void Initialize()
         {
             var services = new ServiceCollection();
 
-            services.AddSingleton(_apiDescriptionGroupCollectionProvider);
+            services.AddSingleton(this.apiDescriptionGroupCollectionProvider);
 
             services.AddSingleton<IWebHostEnvironment>(new FunctionHostingEnvironment());
 
-            if (_swaggerOptions.AddNewtonsoftSupport)
+            if (this.swaggerOptions.AddNewtonsoftSupport)
             {
                 services.AddSwaggerGenNewtonsoftSupport();
             }
 
             services.AddSwaggerGen(options =>
             {
-                if (!_swaggerOptions.Documents.Any())
+                if (!this.swaggerOptions.Documents.Any())
                 {
                     var defaultDocument = new SwaggerDocument();
                     AddSwaggerDocument(options, defaultDocument);
                 }
                 else
                 {
-                    foreach (var optionDocument in _swaggerOptions.Documents)
+                    foreach (var optionDocument in this.swaggerOptions.Documents)
                     {
                         AddSwaggerDocument(options, optionDocument);
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(_xmlPath))
+                if (!string.IsNullOrWhiteSpace(this.xmlPath))
                 {
-                    var xmlDoc = new XPathDocument(_xmlPath);
-                    options.IncludeXmlComments(_xmlPath);
+                    var xmlDoc = new XPathDocument(this.xmlPath);
+                    options.IncludeXmlComments(this.xmlPath);
                     options.OperationFilter<XmlCommentsOperationFilterWithParams>(xmlDoc);
                     options.ParameterFilter<XmlCommentsParameterFilterWithExamples>(xmlDoc);
                     options.SchemaFilter<XmlCommentsSchemaFilterChanged>(xmlDoc);
@@ -141,67 +149,43 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 options.OperationFilter<GenerateOperationIdFilter>();
                 options.OperationFilter<FileUploadOperationFilter>();
 
-                _swaggerOptions.ConfigureSwaggerGen?.Invoke(options);
+                this.swaggerOptions.ConfigureSwaggerGen?.Invoke(options);
             });
 
-            _serviceProvider = services.BuildServiceProvider(true);
+            this.serviceProvider = services.BuildServiceProvider(true);
         }
 
         public string GetSwaggerOAuth2RedirectContent()
         {
-            return _oauth2RedirectLazy.Value;
+            return this.oauth2RedirectLazy.Value;
         }
 
         public string GetSwaggerUIContent(string swaggerUrl)
         {
-            if (_swaggerOptions.OverridenPathToSwaggerJson != null)
+            if (this.swaggerOptions.OverridenPathToSwaggerJson != null)
             {
-                swaggerUrl = _swaggerOptions.OverridenPathToSwaggerJson.ToString();
+                swaggerUrl = this.swaggerOptions.OverridenPathToSwaggerJson.ToString();
             }
 
-            var html = _indexHtmlLazy.Value;
+            var html = this.indexHtmlLazy.Value;
             return html
                 .Replace("{url}", swaggerUrl)
-                .Replace("{oauth2RedirectUrl}", _swaggerOptions.OAuth2RedirectPath)
-                .Replace("{clientId}", _swaggerOptions.ClientId);
+                .Replace("{oauth2RedirectUrl}", this.swaggerOptions.OAuth2RedirectPath)
+                .Replace("{clientId}", this.swaggerOptions.ClientId);
         }
 
         public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
         {
-            var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
+            var swaggerProvider = this.serviceProvider!.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return SerializeJsonDocument(document);
+            return this.SerializeJsonDocument(document);
         }
 
         public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
         {
-            var swaggerProvider = _serviceProvider.GetRequiredService<ISwaggerProvider>();
+            var swaggerProvider = this.serviceProvider!.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return SerializeYamlDocument(document);
-        }
-
-        private MemoryStream SerializeJsonDocument(OpenApiDocument document)
-        {
-            var memoryStream = new MemoryStream();
-            document.SerializeAsJson(memoryStream,
-                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
-                    OpenApiSpecVersion.OpenApi2_0 :
-                    OpenApiSpecVersion.OpenApi3_0);
-
-            memoryStream.Position = 0;
-            return memoryStream;
-        }
-
-        private MemoryStream SerializeYamlDocument(OpenApiDocument document)
-        {
-            var memoryStream = new MemoryStream();
-            document.SerializeAsYaml(memoryStream,
-                _swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ?
-                    OpenApiSpecVersion.OpenApi2_0 :
-                    OpenApiSpecVersion.OpenApi3_0);
-
-            memoryStream.Position = 0;
-            return memoryStream;
+            return this.SerializeYamlDocument(document);
         }
 
         private static void AddSwaggerDocument(SwaggerGenOptions options, SwaggerDocument document)
@@ -232,15 +216,37 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             string? replacement = null)
         {
             var entry = archive.GetEntry(entryName);
-            using var stream = entry.Open();
+            using var stream = entry!.Open();
             using var reader = new StreamReader(stream);
             var value = reader.ReadToEnd();
 
-            documentHtml = !String.IsNullOrEmpty(replacement) ?
+            documentHtml = !string.IsNullOrEmpty(replacement) ?
                 documentHtml.Replace(replacement, value) :
                 value;
 
             return documentHtml;
+        }
+
+        private MemoryStream SerializeJsonDocument(OpenApiDocument document)
+        {
+            var memoryStream = new MemoryStream();
+            document.SerializeAsJson(
+                memoryStream,
+                this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? OpenApiSpecVersion.OpenApi2_0 : OpenApiSpecVersion.OpenApi3_0);
+
+            memoryStream.Position = 0;
+            return memoryStream;
+        }
+
+        private MemoryStream SerializeYamlDocument(OpenApiDocument document)
+        {
+            var memoryStream = new MemoryStream();
+            document.SerializeAsYaml(
+                memoryStream,
+                this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? OpenApiSpecVersion.OpenApi2_0 : OpenApiSpecVersion.OpenApi3_0);
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
     }
 }

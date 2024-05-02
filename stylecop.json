@@ -1,0 +1,26 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+    "settings": {
+      "documentationRules": {
+        "companyName": "Vitali Bibikov",
+        "copyrightText": "Copyright (c) {Vitali Bibikov}. All Rights Reserved.\r\n.",
+        "xmlHeader": false,
+        "fileNamingConvention": "metadata"
+      },
+      "layoutRules": {
+        "newlineAtEndOfFile": "require"
+      },
+        "spacingRules": {},
+        "readabilityRules": {},
+        "orderingRules": {
+            "usingDirectivesPlacement": "outsideNamespace",
+            "blankLinesBetweenUsingGroups": "omit"
+        },
+        "indentation": {
+            "indentationSize": 4,
+            "tabSize": 4,
+            "useTabs": false
+        },
+        "maintainabilityRules": {}
+    }
+}

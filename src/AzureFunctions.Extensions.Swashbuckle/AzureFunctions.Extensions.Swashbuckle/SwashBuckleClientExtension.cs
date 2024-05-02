@@ -15,7 +15,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             HttpRequestData requestData,
             string documentName = "v1")
         {
-            var host = GetBaseUri(client, requestData);
+            var host = GetBaseUri(requestData);
 
             var stream = client.GetSwaggerJsonDocument(host, documentName);
             var reader = new StreamReader(stream);
@@ -25,7 +25,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
             await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
 
             //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
             return response;
         }
 
@@ -34,7 +33,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             HttpRequestData requestData,
             string documentName = "v1")
         {
-            var host = GetBaseUri(client, requestData);
+            var host = GetBaseUri(requestData);
 
             var stream = client.GetSwaggerYamlDocument(host, documentName);
             var reader = new StreamReader(stream);
@@ -57,7 +56,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 ? string.Empty
                 : $"/{client.RoutePrefix}";
 
-            var host = GetBaseUri(client, requestData);
+            var host = GetBaseUri(requestData);
             var stream = client.GetSwaggerUi($"{host}{routePrefix}/{documentRoute}");
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
@@ -65,7 +64,6 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var document = await reader.ReadToEndAsync();
             await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
             //response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-
             return response;
         }
 
@@ -83,7 +81,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
             return response;
         }
 
-        private static string GetBaseUri(ISwashBuckleClient client, HttpRequestData requestData)
+        private static string GetBaseUri(HttpRequestData requestData)
         {
             var host = requestData.Url.Host;
             var port = requestData.Url.Port;  // Get the port

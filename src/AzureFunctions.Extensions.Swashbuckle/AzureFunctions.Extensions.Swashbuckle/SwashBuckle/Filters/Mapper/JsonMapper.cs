@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.OpenApi.Any;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
 {
-    //todo: Remove with the new version of Swachbuckle
     public static class JsonMapper
     {
-        public static IOpenApiAny CreateFromJson(string str)
+        public static IOpenApiAny? CreateFromJson(string str)
         {
             try
             {
@@ -15,34 +13,51 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
                 var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
 
                 if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
+                {
                     return new OpenApiBoolean(jsonElement.GetBoolean());
+                }
 
                 if (jsonElement.ValueKind == JsonValueKind.Number)
                 {
-                    if (jsonElement.TryGetInt32(out int intValue))
+                    if (jsonElement.TryGetInt32(out var intValue))
+                    {
                         return new OpenApiInteger(intValue);
+                    }
 
-                    if (jsonElement.TryGetInt64(out long longValue))
+                    if (jsonElement.TryGetInt64(out var longValue))
+                    {
                         return new OpenApiLong(longValue);
+                    }
 
-                    if (jsonElement.TryGetSingle(out float floatValue) && !float.IsInfinity(floatValue))
+                    if (jsonElement.TryGetSingle(out var floatValue) && !float.IsInfinity(floatValue))
+                    {
                         return new OpenApiFloat(floatValue);
+                    }
 
-                    if (jsonElement.TryGetDouble(out double doubleValue))
+                    if (jsonElement.TryGetDouble(out var doubleValue))
+                    {
                         return new OpenApiDouble(doubleValue);
+                    }
                 }
 
                 if (jsonElement.ValueKind == JsonValueKind.String)
+                {
                     return new OpenApiString(jsonElement.ToString());
+                }
 
                 if (jsonElement.ValueKind == JsonValueKind.Null)
+                {
                     return new OpenApiNull();
+                }
 
                 if (jsonElement.ValueKind == JsonValueKind.Array)
+                {
                     return CreateOpenApiArray(jsonElement.EnumerateArray());
-
+                }
             }
-            catch { }
+            catch
+            {
+            }
 
             return null;
         }
