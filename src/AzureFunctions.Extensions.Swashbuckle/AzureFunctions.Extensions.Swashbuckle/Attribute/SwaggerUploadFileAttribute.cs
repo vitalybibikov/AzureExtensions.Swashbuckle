@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
@@ -7,9 +7,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
     {
         public SwaggerUploadFileAttribute(string name, string description, string example = "")
         {
-            Name = name;
-            Description = description;
-            Example = example;
+            this.Name = name;
+            this.Description = description;
+            this.Example = example;
         }
 
         public string Name { get; }

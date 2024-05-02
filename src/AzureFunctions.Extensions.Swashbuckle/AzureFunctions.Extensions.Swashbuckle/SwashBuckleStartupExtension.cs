@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
@@ -8,34 +7,44 @@ using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
     public static class SwashBuckleStartupExtension
     {
-        public static IFunctionsWorkerApplicationBuilder AddSwashBuckle(
-            this IFunctionsWorkerApplicationBuilder builder,
-            Assembly assembly,
-            Action<SwaggerDocOptions> configureDocOptionsAction = null)
-        {
-            builder.Services.AddSwashBuckle(configureDocOptionsAction);
-            return builder;
-        }
-
         public static IServiceCollection AddSwashBuckle(
             this IServiceCollection services,
-            Action<SwaggerDocOptions> configureDocOptionsAction = null)
+            Action<SwaggerDocOptions>? configureDocOptionsAction = null,
+            Assembly? executingAssembly = null)
         {
-            services.Configure(configureDocOptionsAction);
+            if (configureDocOptionsAction != null)
+            {
+                services.Configure(configureDocOptionsAction);
+            }
+
+            Assembly? assembly;
+            
+            if (executingAssembly == null)
+            {
+                assembly = Assembly.GetEntryAssembly();
+
+                if (assembly == null)
+                {
+                    throw new ArgumentNullException(nameof(assembly));
+                }
+            }
+            else
+            {
+                assembly = executingAssembly;
+            }
 
             services.AddSingleton<ISwashBuckleClient, SwashBuckleClient>();
             services.AddSingleton<SwashbuckleConfig>();
             services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
             services.AddSingleton(new SwashBuckleStartupConfig
             {
-                Assembly = Assembly.GetEntryAssembly()
+                Assembly = assembly
             });
 
             var jsonOptions = new JsonSerializerOptions

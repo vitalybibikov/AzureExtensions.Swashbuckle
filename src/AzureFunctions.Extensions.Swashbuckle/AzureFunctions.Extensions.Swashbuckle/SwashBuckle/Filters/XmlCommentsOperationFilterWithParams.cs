@@ -1,5 +1,3 @@
-﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Xml.XPath;
 using Microsoft.OpenApi.Models;
@@ -9,11 +7,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
 {
     public class XmlCommentsOperationFilterWithParams : IOperationFilter
     {
-        private readonly XPathNavigator _xmlNavigator;
+        private readonly XPathNavigator xmlNavigator;
 
         public XmlCommentsOperationFilterWithParams(XPathDocument xmlDoc)
         {
-            _xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
+            this.xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
         }
 
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
@@ -32,9 +30,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 return;
             }
 
-            ApplyParameters(operation, targetMethod);
-            ApplyControllerTags(operation, targetMethod.DeclaringType);
-            ApplyMethodTags(operation, targetMethod);
+            this.ApplyParameters(operation, targetMethod);
+            this.ApplyControllerTags(operation, targetMethod.DeclaringType!);
+            this.ApplyMethodTags(operation, targetMethod);
         }
 
         private void ApplyParameters(OpenApiOperation operation, MethodInfo methodInfo)
@@ -44,14 +42,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 var methodMemberName = XmlCommentsNodeNameHelper.GetMemberNameForMethod(methodInfo);
                 foreach (var parameter in methodInfo.GetParameters())
                 {
-                    if (!String.IsNullOrEmpty(parameter.Name))
+                    if (!string.IsNullOrEmpty(parameter.Name))
                     {
-                        var paramNode = _xmlNavigator.SelectSingleNode(
+                        var paramNode = this.xmlNavigator.SelectSingleNode(
                             $"/doc/members/member[@name='{methodMemberName}']/param[@name='{parameter.Name}']");
 
                         if (paramNode != null)
                         {
-                            var humanizedDescription =  XmlCommentsTextHelper.Humanize(paramNode.InnerXml);
+                            var humanizedDescription = XmlCommentsTextHelper.Humanize(paramNode.InnerXml);
 
                             var operationParameter = operation.Parameters
                                 .FirstOrDefault(x => x.Name == parameter.Name);
@@ -69,37 +67,43 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
         private void ApplyControllerTags(OpenApiOperation operation, Type controllerType)
         {
             var typeMemberName = XmlCommentsNodeNameHelper.GetMemberNameForType(controllerType);
-            var responseNodes = _xmlNavigator.Select($"/doc/members/member[@name='{typeMemberName}']/response");
-            ApplyResponseTags(operation, responseNodes);
+            var responseNodes = this.xmlNavigator.Select($"/doc/members/member[@name='{typeMemberName}']/response");
+            this.ApplyResponseTags(operation, responseNodes);
         }
 
         private void ApplyMethodTags(OpenApiOperation operation, MethodInfo methodInfo)
         {
             var methodMemberName = XmlCommentsNodeNameHelper.GetMemberNameForMethod(methodInfo);
-            var methodNode = _xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{methodMemberName}']");
+            var methodNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{methodMemberName}']");
 
-            if (methodNode == null) return;
+            if (methodNode == null)
+            {
+                return;
+            }
 
             var summaryNode = methodNode.SelectSingleNode("summary");
             if (summaryNode != null)
+            {
                 operation.Summary = XmlCommentsTextHelper.Humanize(summaryNode.InnerXml);
+            }
 
             var remarksNode = methodNode.SelectSingleNode("remarks");
             if (remarksNode != null)
+            {
                 operation.Description = XmlCommentsTextHelper.Humanize(remarksNode.InnerXml);
-
+            }
+            
             var responseNodes = methodNode.Select("response");
-            ApplyResponseTags(operation, responseNodes);
+            this.ApplyResponseTags(operation, responseNodes);
         }
 
-        
         private void ApplyResponseTags(OpenApiOperation operation, XPathNodeIterator responseNodes)
         {
             while (responseNodes.MoveNext())
             {
-                var code = responseNodes.Current.GetAttribute("code", "");
-                var response = operation.Responses.ContainsKey(code)
-                    ? operation.Responses[code]
+                var code = responseNodes.Current!.GetAttribute("code", string.Empty);
+                var response = operation.Responses.TryGetValue(code, out var operationResponse)
+                    ? operationResponse
                     : operation.Responses[code] = new OpenApiResponse();
 
                 response.Description = XmlCommentsTextHelper.Humanize(responseNodes.Current.InnerXml);

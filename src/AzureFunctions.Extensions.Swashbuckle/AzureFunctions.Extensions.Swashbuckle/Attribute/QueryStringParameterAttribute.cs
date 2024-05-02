@@ -5,81 +5,72 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
     public class QueryStringParameterAttribute : System.Attribute
-
     {
         public QueryStringParameterAttribute(string name, string description)
         {
-            Initialise(name, description);
-            Example = new OpenApiNull();
+            this.Initialize(name, description);
+            this.Example = new OpenApiNull();
         }
 
         public QueryStringParameterAttribute(string name, string description, string example)
         {
-
-            Initialise(name, description);
-            DataType = typeof(string);
-            Example = new OpenApiString(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(string);
+            this.Example = new OpenApiString(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, int example)
         {
-            Initialise(name, description);
-            DataType = typeof(int);
-            Example = new OpenApiInteger(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(int);
+            this.Example = new OpenApiInteger(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, long example)
         {
-
-            Initialise(name, description);
-            DataType = typeof(long);
-            Example = new OpenApiLong(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(long);
+            this.Example = new OpenApiLong(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, double example)
         {
-            Initialise(name, description);
-            Example = new OpenApiDouble(example);
+            this.Initialize(name, description);
+            this.Example = new OpenApiDouble(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, float example)
         {
-            Initialise(name, description);
-            DataType = typeof(float);
-            Example = new OpenApiFloat(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(float);
+            this.Example = new OpenApiFloat(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, byte example)
         {
-            Initialise(name, description);
-            DataType = typeof(byte);
-            Example = new OpenApiByte(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(byte);
+            this.Example = new OpenApiByte(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, bool example)
         {
-            Initialise(name, description);
-            DataType = typeof(bool);
-            Example = new OpenApiBoolean(example);
+            this.Initialize(name, description);
+            this.DataType = typeof(bool);
+            this.Example = new OpenApiBoolean(example);
         }
 
-        private void Initialise(string name, string description)
+        private void Initialize(string name, string description)
         {
-            Name = name;
-            Description = description;
+            this.Name = name;
+            this.Description = description;
         }
-
-        #region public properties
 
         public string Name { get; set; }
         public Type DataType { get; set; }
         public string Description { get; set; }
         public bool Required { get; set; } = false;
         public IOpenApiAny Example { get; }
-
-        #endregion
-
     }
-
 }
 
