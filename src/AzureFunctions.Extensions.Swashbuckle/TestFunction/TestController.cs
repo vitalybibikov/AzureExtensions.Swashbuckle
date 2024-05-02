@@ -127,23 +127,21 @@ namespace TestFunction
         [ProducesResponseType(typeof(TestModel), (int)HttpStatusCode.Created)]
         [RequestHttpHeader("x-ms-session-id", true)]
         [Function("TestUpload")]
-        [RequestHttpHeader("x-ms-session-id", true)]
-        [SwaggerUploadFileAttribute("Pdf", "Pdf upload")]
+        [SwaggerUploadFile("Pdf", "Pdf upload")]
         public async Task<IActionResult> TestUpload(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/upload")]
-            HttpRequestMessage httpRequest)
-
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "test/upload")] HttpRequest req)
         {
-            //var data = await httpRequest.Content.ReadAsMultipartAsync();
+            var data = await req.ReadFormAsync();
 
-            //if (data != null && data.Contents != null)
-            //{
-            //    foreach (var content in data.Contents)
-            //    {
-            //        var result = await content.ReadAsStringAsync();
-            //        return new OkObjectResult(result.Length);
-            //    }
-            //}
+            if (data != null)
+            {
+                foreach (var formFile in data.Files)
+                {
+                    using var reader = new StreamReader(formFile.OpenReadStream());
+                    var fileContent = await reader.ReadToEndAsync();
+                    return new OkObjectResult(fileContent.Length);
+                }
+            }
 
             return new NoContentResult();
         }
