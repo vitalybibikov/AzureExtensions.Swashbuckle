@@ -7,6 +7,10 @@ OpenAPI 2/3 implementation based on Swashbuckle(Swagger) tooling for API's built
 
 This product aims to easily provide Swagger and Swagger UI of APIs created in Azure Functions using isolated worker model
 
+------------------------------
+4.0.2
+- Updated to latest Swagger 6.5.1
+- Fixes & Improvements
 
 ------------------------------
 4.0.1
