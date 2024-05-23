@@ -80,8 +80,9 @@ var host = new HostBuilder()
 
             // set up your client ID if your API is protected
             opts.ClientId = "your.client.id";
+            opts.ClientSecret = "your.client.secret";
+            opts.UsePkceWithAuthorizationCodeGrant = true;
             opts.OAuth2RedirectPath = "http://localhost:7071/api/swagger/oauth2-redirect";
-
         });
     })
     .Build();

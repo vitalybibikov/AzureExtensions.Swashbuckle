@@ -24,7 +24,13 @@ namespace AzureFunctions.Extensions.Swashbuckle.Settings
 
         public string ClientId { get; set; } = string.Empty;
 
+        public string ClientSecret { get; set; } = string.Empty;
+
         public string OAuth2RedirectPath { get; set; } = string.Empty;
+
+        public bool UseBasicAuthenticationWithAccessCodeGrant { get; set; } = false;
+
+        public bool UsePkceWithAuthorizationCodeGrant { get; set; } = false;
 
         public bool AddNewtonsoftSupport { get; set; } = false;
 
