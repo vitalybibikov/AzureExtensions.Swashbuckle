@@ -171,7 +171,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             return html
                 .Replace("{url}", swaggerUrl)
                 .Replace("{oauth2RedirectUrl}", this.swaggerOptions.OAuth2RedirectPath)
-                .Replace("{clientId}", this.swaggerOptions.ClientId);
+                .Replace("{clientId}", this.swaggerOptions.ClientId)
+                .Replace("{clientSecret}", this.swaggerOptions.ClientSecret)
+                .Replace("{useBasicAuthenticationWithAccessCodeGrant}", this.swaggerOptions.UseBasicAuthenticationWithAccessCodeGrant ? "true" : "false")
+                .Replace("{usePkceWithAuthorizationCodeGrant}", this.swaggerOptions.UsePkceWithAuthorizationCodeGrant ? "true" : "false");
         }
 
         public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
