@@ -52,7 +52,7 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.6.1">
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="8.0.3">
+    <PackageReference Include="System.Text.Json" Version="8.0.4">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
