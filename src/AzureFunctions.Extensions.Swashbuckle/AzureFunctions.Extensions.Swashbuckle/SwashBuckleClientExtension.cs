@@ -22,9 +22,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var document = await reader.ReadToEndAsync();
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
 
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             return response;
         }
 
@@ -41,8 +41,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var response = requestData.CreateResponse(HttpStatusCode.OK);
 
             var document = await reader.ReadToEndAsync();
-            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
 
             return response;
         }
@@ -62,8 +62,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             using var reader = new StreamReader(stream);
             var document = await reader.ReadToEndAsync();
+            response.Headers.Add("Content-Type", "text/html; charset=utf-8");
             await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
-            //response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+ 
             return response;
         }
 
@@ -76,8 +77,9 @@ namespace AzureFunctions.Extensions.Swashbuckle
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             using var reader = new StreamReader(stream);
             var document = await reader.ReadToEndAsync();
+            response.Headers.Add("Content-Type", "text/html; charset=utf-8");
             await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
-            //response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+
             return response;
         }
 
