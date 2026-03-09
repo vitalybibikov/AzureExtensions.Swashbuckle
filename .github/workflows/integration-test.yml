@@ -152,3 +152,4 @@ jobs:
 
           Write-Host "`n=== ALL INTEGRATION TESTS PASSED ==="
           Stop-Process -Id $funcProcess.Id -Force -ErrorAction SilentlyContinue
+          exit 0
