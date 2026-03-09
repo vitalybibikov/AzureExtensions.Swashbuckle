@@ -81,10 +81,16 @@ jobs:
             8.0.x
             9.0.x
 
+      - name: Build
+        run: |
+          dotnet build src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.csproj \
+            --configuration Release
+
       - name: Pack NuGet
         run: |
           dotnet pack src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.csproj \
             --configuration Release \
+            --no-build \
             --output ./nupkgs
 
       - name: Validate NuGet package
