@@ -1,0 +1,153 @@
+name: Integration Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  TEST_FUNCTION_DIR: src/AzureFunctions.Extensions.Swashbuckle/TestFunction
+
+jobs:
+  integration-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Install Azure Functions Core Tools
+        shell: bash
+        run: npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+      - name: Install and start Azurite
+        shell: bash
+        run: |
+          npm install -g azurite
+          azurite --silent &
+          sleep 2
+
+      - name: Build TestFunction
+        run: dotnet build ${{ env.TEST_FUNCTION_DIR }} --configuration Debug
+
+      - name: Start func host and test endpoints (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          cd ${{ env.TEST_FUNCTION_DIR }}
+          func start --port 7071 &
+          FUNC_PID=$!
+
+          # Wait for host to be ready
+          echo "Waiting for func host..."
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:7071/api/test 2>/dev/null | grep -q "200"; then
+              echo "Host ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+          echo "=== Test: GET /api/test ==="
+          STATUS=$(curl -s -o /tmp/test_body.txt -w "%{http_code}" http://127.0.0.1:7071/api/test)
+          echo "Status: $STATUS"
+          cat /tmp/test_body.txt
+          [ "$STATUS" = "200" ] || { echo "FAIL: /api/test returned $STATUS"; exit 1; }
+
+          echo ""
+          echo "=== Test: GET /api/Swagger/json ==="
+          STATUS=$(curl -s -o /tmp/json_body.txt -w "%{http_code}" -m 15 http://127.0.0.1:7071/api/Swagger/json)
+          echo "Status: $STATUS"
+          head -5 /tmp/json_body.txt
+          [ "$STATUS" = "200" ] || { echo "FAIL: /api/Swagger/json returned $STATUS"; exit 1; }
+          grep -q "openapi" /tmp/json_body.txt || { echo "FAIL: JSON missing 'openapi'"; exit 1; }
+
+          echo ""
+          echo "=== Test: GET /api/Swagger/ui ==="
+          STATUS=$(curl -s -o /tmp/ui_body.txt -w "%{http_code}" -m 15 http://127.0.0.1:7071/api/Swagger/ui)
+          echo "Status: $STATUS"
+          echo "Body size: $(wc -c < /tmp/ui_body.txt) bytes"
+          [ "$STATUS" = "200" ] || { echo "FAIL: /api/Swagger/ui returned $STATUS"; exit 1; }
+          grep -q "<html" /tmp/ui_body.txt || { echo "FAIL: UI missing '<html'"; exit 1; }
+
+          echo ""
+          echo "=== Test: GET /api/Swagger/yaml ==="
+          STATUS=$(curl -s -o /tmp/yaml_body.txt -w "%{http_code}" -m 15 http://127.0.0.1:7071/api/Swagger/yaml)
+          echo "Status: $STATUS"
+          head -3 /tmp/yaml_body.txt
+          [ "$STATUS" = "200" ] || { echo "FAIL: /api/Swagger/yaml returned $STATUS"; exit 1; }
+
+          echo ""
+          echo "=== ALL INTEGRATION TESTS PASSED ==="
+          kill $FUNC_PID 2>/dev/null || true
+
+      - name: Start func host and test endpoints (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cd ${{ env.TEST_FUNCTION_DIR }}
+          $funcProcess = Start-Process -FilePath "func" -ArgumentList "start","--port","7071" -PassThru -NoNewWindow -RedirectStandardOutput func_stdout.txt -RedirectStandardError func_stderr.txt
+
+          # Wait for host to be ready
+          Write-Host "Waiting for func host..."
+          $ready = $false
+          for ($i = 1; $i -le 40; $i++) {
+            try {
+              $response = Invoke-WebRequest -Uri "http://127.0.0.1:7071/api/test" -TimeoutSec 3 -ErrorAction Stop
+              if ($response.StatusCode -eq 200) {
+                Write-Host "Host ready after ${i}s"
+                $ready = $true
+                break
+              }
+            } catch { }
+            Start-Sleep -Seconds 1
+          }
+
+          if (-not $ready) {
+            Write-Host "=== func stdout ==="
+            Get-Content func_stdout.txt -ErrorAction SilentlyContinue
+            Write-Host "=== func stderr ==="
+            Get-Content func_stderr.txt -ErrorAction SilentlyContinue
+            Stop-Process -Id $funcProcess.Id -Force -ErrorAction SilentlyContinue
+            throw "Func host did not become ready within 40s"
+          }
+
+          Write-Host "`n=== Test: GET /api/test ==="
+          $r = Invoke-WebRequest -Uri "http://127.0.0.1:7071/api/test" -TimeoutSec 10
+          Write-Host "Status: $($r.StatusCode)"
+          Write-Host $r.Content
+          if ($r.StatusCode -ne 200) { throw "FAIL: /api/test returned $($r.StatusCode)" }
+
+          Write-Host "`n=== Test: GET /api/Swagger/json ==="
+          $r = Invoke-WebRequest -Uri "http://127.0.0.1:7071/api/Swagger/json" -TimeoutSec 15
+          Write-Host "Status: $($r.StatusCode)"
+          Write-Host ($r.Content.Substring(0, [Math]::Min(200, $r.Content.Length)))
+          if ($r.StatusCode -ne 200) { throw "FAIL: /api/Swagger/json returned $($r.StatusCode)" }
+          if (-not $r.Content.Contains("openapi")) { throw "FAIL: JSON missing 'openapi'" }
+
+          Write-Host "`n=== Test: GET /api/Swagger/ui ==="
+          $r = Invoke-WebRequest -Uri "http://127.0.0.1:7071/api/Swagger/ui" -TimeoutSec 15
+          Write-Host "Status: $($r.StatusCode)"
+          Write-Host "Body size: $($r.Content.Length) bytes"
+          if ($r.StatusCode -ne 200) { throw "FAIL: /api/Swagger/ui returned $($r.StatusCode)" }
+          if (-not $r.Content.Contains("<html")) { throw "FAIL: UI missing '<html'" }
+
+          Write-Host "`n=== Test: GET /api/Swagger/yaml ==="
+          $r = Invoke-WebRequest -Uri "http://127.0.0.1:7071/api/Swagger/yaml" -TimeoutSec 15
+          Write-Host "Status: $($r.StatusCode)"
+          Write-Host ($r.Content.Substring(0, [Math]::Min(200, $r.Content.Length)))
+          if ($r.StatusCode -ne 200) { throw "FAIL: /api/Swagger/yaml returned $($r.StatusCode)" }
+
+          Write-Host "`n=== ALL INTEGRATION TESTS PASSED ==="
+          Stop-Process -Id $funcProcess.Id -Force -ErrorAction SilentlyContinue
