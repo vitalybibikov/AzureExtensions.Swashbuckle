@@ -19,17 +19,16 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['8.0.x', '9.0.x']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET ${{ matrix.dotnet-version }}
+      - name: Setup .NET 8.0 and 9.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
@@ -52,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-${{ matrix.dotnet-version }}
+          name: test-results
           path: ./test-results/*.trx
           retention-days: 30
 
@@ -66,7 +65,7 @@ jobs:
           create-pr-comment: true
           update-comment-if-one-exists: true
           ignore-test-failures: false
-          comment-identifier: 'swashbuckle-tests-${{ matrix.dotnet-version }}'
+          comment-identifier: 'swashbuckle-tests'
 
   pack:
     needs: build-and-test
@@ -75,10 +74,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 8.0 and 9.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Pack NuGet
         run: |
