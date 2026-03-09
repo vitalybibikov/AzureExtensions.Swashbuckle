@@ -4,6 +4,9 @@
     "http": {
       "routePrefix": "api"
     }
+  },
+  "healthMonitor": {
+    "enabled": false
   }
 }
 
