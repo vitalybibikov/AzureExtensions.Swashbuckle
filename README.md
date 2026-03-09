@@ -17,12 +17,25 @@ Swagger and Swagger UI for **Azure Functions** (isolated worker model) powered b
 ![.NET 8](https://img.shields.io/badge/.NET-8.0_LTS-512BD4?logo=dotnet&logoColor=white)
 ![.NET 9](https://img.shields.io/badge/.NET-9.0_STS-512BD4?logo=dotnet&logoColor=white)
 ![Swashbuckle 10](https://img.shields.io/badge/Swashbuckle-10.x-85EA2D?logo=swagger&logoColor=white)
+![Swagger UI](https://img.shields.io/badge/Swagger_UI-5.32.0-85EA2D?logo=swagger&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-2.0_|_3.0_|_3.1-6BA539?logo=openapiinitiative&logoColor=white)
 ![Azure Functions](https://img.shields.io/badge/Azure_Functions-Isolated_Worker-0062AD?logo=azurefunctions&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-136_passed-brightgreen?logo=dotnet&logoColor=white)
 
 </p>
 
 ---
+
+## What's New in v5.0.1
+
+- Updated embedded Swagger UI from v5.11 to **v5.32.0**
+- Fixed resource leaks in response extension methods
+- Fixed route parameter regex matching bug
+- Fixed `FunctionContext` incorrectly treated as body parameter ([#122](https://github.com/vitalybibikov/AzureExtensions.Swashbuckle/issues/122))
+- Fixed XML documentation file not found in TFM subdirectories ([#114](https://github.com/vitalybibikov/AzureExtensions.Swashbuckle/issues/114))
+- Fixed Content-Type header on JSON/YAML responses ([#119](https://github.com/vitalybibikov/AzureExtensions.Swashbuckle/issues/119))
+- Added `IDisposable` to `SwashbuckleConfig` for proper cleanup
+- Added 136 unit, integration, and end-to-end tests
 
 ## Features
 
