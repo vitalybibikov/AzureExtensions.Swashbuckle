@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
 using AzureFunctions.Extensions.Swashbuckle;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -11,6 +13,21 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication(builder =>
     {
+        builder.Use(next => async context =>
+        {
+            var logger = context.GetLogger("Pipeline");
+            logger.LogWarning("[PIPELINE] >>> Function={FunctionName}", context.FunctionDefinition.Name);
+            try
+            {
+                await next(context);
+                logger.LogWarning("[PIPELINE] <<< Function={FunctionName} completed", context.FunctionDefinition.Name);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[PIPELINE] !!! Function={FunctionName} exception", context.FunctionDefinition.Name);
+                throw;
+            }
+        });
     })
     .ConfigureAppConfiguration((hostContext, services) =>
     {

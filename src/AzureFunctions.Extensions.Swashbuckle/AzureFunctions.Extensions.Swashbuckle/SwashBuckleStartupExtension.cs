@@ -7,6 +7,7 @@ using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AzureFunctions.Extensions.Swashbuckle
@@ -39,10 +40,10 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 assembly = executingAssembly;
             }
 
-            services.AddMvcCore();
             services.AddSingleton<ISwashBuckleClient, SwashBuckleClient>();
             services.AddSingleton<SwashbuckleConfig>();
             services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
+            services.AddSingleton<ICompositeMetadataDetailsProvider>(new EmptyCompositeMetadataDetailsProvider());
             services.AddSingleton(new SwashBuckleStartupConfig
             {
                 Assembly = assembly
