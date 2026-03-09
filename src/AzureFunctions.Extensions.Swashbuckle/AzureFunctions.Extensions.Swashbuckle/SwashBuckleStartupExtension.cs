@@ -39,6 +39,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 assembly = executingAssembly;
             }
 
+            services.AddMvcCore();
             services.AddSingleton<ISwashBuckleClient, SwashBuckleClient>();
             services.AddSingleton<SwashbuckleConfig>();
             services.AddSingleton<IModelMetadataProvider>(new EmptyModelMetadataProvider());
