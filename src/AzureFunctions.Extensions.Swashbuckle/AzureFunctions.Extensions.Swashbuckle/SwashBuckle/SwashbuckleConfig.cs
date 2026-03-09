@@ -15,7 +15,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
-    public sealed class SwashbuckleConfig
+    public sealed class SwashbuckleConfig : IDisposable
     {
         private const string ZippedResources = "EmbededResources.resources.zip";
         private const string IndexHtmlName = "index.html";
@@ -75,11 +75,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 // Search for XML file in multiple locations:
                 // 1. Same directory as the assembly (e.g., bin/Debug/net8.0/)
                 // 2. Parent directory (e.g., bin/Debug/) for backward compatibility
-                var candidatePaths = new[]
-                {
-                    Path.Combine(binPath, this.swaggerOptions.XmlPath),
-                    Path.Combine(Directory.CreateDirectory(binPath).Parent?.FullName ?? binPath, this.swaggerOptions.XmlPath)
-                };
+                var parentPath = Directory.GetParent(binPath)?.FullName;
+                var candidatePaths = parentPath != null
+                    ? new[] { Path.Combine(binPath, this.swaggerOptions.XmlPath), Path.Combine(parentPath, this.swaggerOptions.XmlPath) }
+                    : new[] { Path.Combine(binPath, this.swaggerOptions.XmlPath) };
 
                 foreach (var candidatePath in candidatePaths)
                 {
@@ -192,6 +191,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             var swaggerProvider = this.serviceProvider!.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
             return await this.SerializeYamlDocumentAsync(document);
+        }
+
+        public void Dispose()
+        {
+            this.serviceProvider?.Dispose();
         }
 
         private static void AddSwaggerDocument(SwaggerGenOptions options, SwaggerDocument document)

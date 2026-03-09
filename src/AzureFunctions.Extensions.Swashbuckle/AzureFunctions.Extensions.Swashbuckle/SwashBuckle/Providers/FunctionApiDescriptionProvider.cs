@@ -154,7 +154,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
 
         private static Regex GetRoutePathParamRegex(string parameterName)
         {
-            return new Regex("\\{[" + parameterName + "]+[\\?]{0,1}\\}");
+            return new Regex("\\{" + Regex.Escape(parameterName) + "\\??\\}");
         }
 
         private bool TryGetHttpTrigger(MethodInfo methodInfo, out HttpTriggerAttribute? triggerAttribute)

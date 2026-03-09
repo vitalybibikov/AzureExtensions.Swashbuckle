@@ -17,8 +17,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
         {
             var host = GetBaseUri(requestData);
 
-            var stream = await client.GetSwaggerJsonDocumentAsync(host, documentName);
-            var reader = new StreamReader(stream);
+            using var stream = await client.GetSwaggerJsonDocumentAsync(host, documentName);
+            using var reader = new StreamReader(stream);
             var document = await reader.ReadToEndAsync();
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
@@ -35,8 +35,8 @@ namespace AzureFunctions.Extensions.Swashbuckle
         {
             var host = GetBaseUri(requestData);
 
-            var stream = await client.GetSwaggerYamlDocumentAsync(host, documentName);
-            var reader = new StreamReader(stream);
+            using var stream = await client.GetSwaggerYamlDocumentAsync(host, documentName);
+            using var reader = new StreamReader(stream);
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "application/x-yaml; charset=utf-8");
