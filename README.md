@@ -20,11 +20,16 @@ Swagger and Swagger UI for **Azure Functions** (isolated worker model) powered b
 ![Swagger UI](https://img.shields.io/badge/Swagger_UI-5.32.0-85EA2D?logo=swagger&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-2.0_|_3.0_|_3.1-6BA539?logo=openapiinitiative&logoColor=white)
 ![Azure Functions](https://img.shields.io/badge/Azure_Functions-Isolated_Worker-0062AD?logo=azurefunctions&logoColor=white)
-![Tests](https://img.shields.io/badge/Tests-136_passed-brightgreen?logo=dotnet&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-150_passed-brightgreen?logo=dotnet&logoColor=white)
 
 </p>
 
 ---
+
+## What's New in v5.0.2
+
+- Fixed startup crash (`0x80008096`) caused by missing MVC core service registrations
+- Added 14 functional tests for DI registration validation (150 total)
 
 ## What's New in v5.0.1
 
