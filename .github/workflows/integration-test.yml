@@ -97,7 +97,8 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ env.TEST_FUNCTION_DIR }}
-          $funcProcess = Start-Process -FilePath "func" -ArgumentList "start","--port","7071" -PassThru -NoNewWindow -RedirectStandardOutput func_stdout.txt -RedirectStandardError func_stderr.txt
+          $funcExe = (Get-Command func.cmd -ErrorAction SilentlyContinue) ?? (Get-Command func -ErrorAction Stop)
+          $funcProcess = Start-Process -FilePath $funcExe.Source -ArgumentList "start","--port","7071" -PassThru -NoNewWindow -RedirectStandardOutput func_stdout.txt -RedirectStandardError func_stderr.txt
 
           # Wait for host to be ready
           Write-Host "Waiting for func host..."
