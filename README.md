@@ -20,22 +20,22 @@ Swagger and Swagger UI for **Azure Functions** (isolated worker model) powered b
 ![Swagger UI](https://img.shields.io/badge/Swagger_UI-5.32.0-85EA2D?logo=swagger&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-2.0_|_3.0_|_3.1-6BA539?logo=openapiinitiative&logoColor=white)
 ![Azure Functions](https://img.shields.io/badge/Azure_Functions-Isolated_Worker-0062AD?logo=azurefunctions&logoColor=white)
-![Tests](https://img.shields.io/badge/Tests-150_passed-brightgreen?logo=dotnet&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-191_passed-brightgreen?logo=dotnet&logoColor=white)
 
 </p>
 
 ---
 
-## What's New in v5.0.3
+## What's New in v5.0.4
 
-- Fixed `WriteStringAsync` parameter order in all response extension methods causing responses to hang
-- Fixed undisposed streams in `CreateSwaggerUIResponse` and `CreateSwaggerOAuth2RedirectResponse`
-- Simplified response creation — removed unnecessary `Encoding` and `CancellationToken` overrides
-
-## What's New in v5.0.2
-
+- **New** `IActionResult`-based extension methods for `ConfigureFunctionsWebApplication`
+  - `CreateSwaggerJsonDocumentResult`, `CreateSwaggerYamlDocumentResult`, `CreateSwaggerUIResult`, `CreateSwaggerOAuth2RedirectResult`
+  - Uses `ContentResult` — no `HttpResponseData` pipeline issues
+- **New** `SwaggerValidate` self-test endpoint in TestFunction
+- Fixed response hanging with `ConfigureFunctionsWebApplication` (ASP.NET Core integration)
 - Fixed startup crash (`0x80008096`) caused by missing MVC core service registrations
-- Added 14 functional tests for DI registration validation (150 total)
+- Added test fakes (`FakeHttpRequestData`, `FakeHttpResponseData`) for extension method testing
+- Added 55 new tests: 25 `HttpResponseData` extension + 16 `IActionResult` extension + 14 DI functional (191 total)
 
 ## What's New in v5.0.1
 
@@ -110,6 +110,8 @@ host.Run();
 
 ### 2. Add Swagger Endpoints
 
+**Recommended** — use `IActionResult` with `ConfigureFunctionsWebApplication`:
+
 ```csharp
 public class SwaggerController
 {
@@ -122,29 +124,29 @@ public class SwaggerController
 
     [SwaggerIgnore]
     [Function("SwaggerJson")]
-    public async Task<HttpResponseData> SwaggerJson(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/json")]
-        HttpRequestData req)
+    public async Task<IActionResult> SwaggerJson(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Swagger/json")]
+        HttpRequest req)
     {
-        return await this.swashBuckleClient.CreateSwaggerJsonDocumentResponse(req);
+        return await this.swashBuckleClient.CreateSwaggerJsonDocumentResult(req);
     }
 
     [SwaggerIgnore]
     [Function("SwaggerYaml")]
-    public async Task<HttpResponseData> SwaggerYaml(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/yaml")]
-        HttpRequestData req)
+    public async Task<IActionResult> SwaggerYaml(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Swagger/yaml")]
+        HttpRequest req)
     {
-        return await this.swashBuckleClient.CreateSwaggerYamlDocumentResponse(req);
+        return await this.swashBuckleClient.CreateSwaggerYamlDocumentResult(req);
     }
 
     [SwaggerIgnore]
     [Function("SwaggerUi")]
-    public async Task<HttpResponseData> SwaggerUi(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Swagger/ui")]
-        HttpRequestData req)
+    public async Task<IActionResult> SwaggerUi(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Swagger/ui")]
+        HttpRequest req)
     {
-        return await this.swashBuckleClient.CreateSwaggerUIResponse(req, "swagger/json");
+        return await this.swashBuckleClient.CreateSwaggerUIResult(req, "swagger/json");
     }
 }
 ```
