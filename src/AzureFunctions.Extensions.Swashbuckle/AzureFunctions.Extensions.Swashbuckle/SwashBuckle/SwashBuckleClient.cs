@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
 {
@@ -12,14 +13,14 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             _config = config;
         }
 
-        public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
+        public async Task<Stream> GetSwaggerJsonDocumentAsync(string host, string documentName = "v1")
         {
-            return _config.GetSwaggerJsonDocument(host, documentName);
+            return await _config.GetSwaggerJsonDocumentAsync(host, documentName);
         }
 
-        public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
+        public async Task<Stream> GetSwaggerYamlDocumentAsync(string host, string documentName = "v1")
         {
-            return _config.GetSwaggerYamlDocument(host, documentName);
+            return await _config.GetSwaggerYamlDocumentAsync(host, documentName);
         }
 
         public Stream GetSwaggerOAuth2Redirect()

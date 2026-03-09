@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Xml.XPath;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -38,7 +38,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
         private void ApplyParameters(OpenApiOperation operation, MethodInfo methodInfo)
         {
             if (methodInfo != null)
-            {   
+            {
                 var methodMemberName = XmlCommentsNodeNameHelper.GetMemberNameForMethod(methodInfo);
                 foreach (var parameter in methodInfo.GetParameters())
                 {
@@ -51,7 +51,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                         {
                             var humanizedDescription = XmlCommentsTextHelper.Humanize(paramNode.InnerXml);
 
-                            var operationParameter = operation.Parameters
+                            var operationParameter = operation.Parameters?
                                 .FirstOrDefault(x => x.Name == parameter.Name);
 
                             if (operationParameter != null)
@@ -92,7 +92,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             {
                 operation.Description = XmlCommentsTextHelper.Humanize(remarksNode.InnerXml);
             }
-            
+
             var responseNodes = methodNode.Select("response");
             this.ApplyResponseTags(operation, responseNodes);
         }
@@ -102,6 +102,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             while (responseNodes.MoveNext())
             {
                 var code = responseNodes.Current!.GetAttribute("code", string.Empty);
+                operation.Responses ??= new OpenApiResponses();
                 var response = operation.Responses.TryGetValue(code, out var operationResponse)
                     ? operationResponse
                     : operation.Responses[code] = new OpenApiResponse();

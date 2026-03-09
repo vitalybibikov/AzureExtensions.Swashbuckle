@@ -1,7 +1,6 @@
 using System.Linq;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -34,23 +33,17 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                         Schema = this.schemaGenerator.GenerateSchema(attribute?.DataType, new SchemaRepository())
                     };
 
-                    if (attribute != null)
+                    if (attribute != null && attribute.Example != null)
                     {
-                        switch (attribute.Example)
+                        if (apiParameter.Schema is OpenApiSchema concreteSchema)
                         {
-                            case OpenApiNull _:
-                                /* ignore */
-                                break;
-
-                            default:
-                                // set both examples
-                                apiParameter.Schema.Example = attribute.Example;
-                                apiParameter.Example = apiParameter.Schema.Example;
-                                break;
+                            concreteSchema.Example = attribute.Example;
                         }
+
+                        apiParameter.Example = attribute.Example;
                     }
 
-                    operation.Parameters.Add(apiParameter);
+                    operation.Parameters?.Add(apiParameter);
                 }
             }
         }

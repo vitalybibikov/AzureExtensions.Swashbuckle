@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Microsoft.OpenApi.Any;
+using System.Text.Json.Nodes;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
 {
     public static class JsonMapper
     {
-        public static IOpenApiAny? CreateFromJson(string str)
+        public static JsonNode? CreateFromJson(string str)
         {
             try
             {
@@ -14,45 +14,45 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
 
                 if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
                 {
-                    return new OpenApiBoolean(jsonElement.GetBoolean());
+                    return JsonValue.Create(jsonElement.GetBoolean());
                 }
 
                 if (jsonElement.ValueKind == JsonValueKind.Number)
                 {
                     if (jsonElement.TryGetInt32(out var intValue))
                     {
-                        return new OpenApiInteger(intValue);
+                        return JsonValue.Create(intValue);
                     }
 
                     if (jsonElement.TryGetInt64(out var longValue))
                     {
-                        return new OpenApiLong(longValue);
+                        return JsonValue.Create(longValue);
                     }
 
                     if (jsonElement.TryGetSingle(out var floatValue) && !float.IsInfinity(floatValue))
                     {
-                        return new OpenApiFloat(floatValue);
+                        return JsonValue.Create(floatValue);
                     }
 
                     if (jsonElement.TryGetDouble(out var doubleValue))
                     {
-                        return new OpenApiDouble(doubleValue);
+                        return JsonValue.Create(doubleValue);
                     }
                 }
 
                 if (jsonElement.ValueKind == JsonValueKind.String)
                 {
-                    return new OpenApiString(jsonElement.ToString());
+                    return JsonValue.Create(jsonElement.ToString());
                 }
 
                 if (jsonElement.ValueKind == JsonValueKind.Null)
                 {
-                    return new OpenApiNull();
+                    return null;
                 }
 
                 if (jsonElement.ValueKind == JsonValueKind.Array)
                 {
-                    return CreateOpenApiArray(jsonElement.EnumerateArray());
+                    return CreateJsonArray(jsonElement.EnumerateArray());
                 }
             }
             catch
@@ -62,9 +62,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
             return null;
         }
 
-        private static IOpenApiAny CreateOpenApiArray(IEnumerable<JsonElement> jsonElements)
+        private static JsonNode CreateJsonArray(IEnumerable<JsonElement> jsonElements)
         {
-            var openApiArray = new OpenApiArray();
+            var jsonArray = new JsonArray();
 
             foreach (var jsonElement in jsonElements)
             {
@@ -72,10 +72,10 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper
                     ? $"\"{jsonElement}\""
                     : jsonElement.ToString();
 
-                openApiArray.Add(CreateFromJson(json));
+                jsonArray.Add(CreateFromJson(json));
             }
 
-            return openApiArray;
+            return jsonArray;
         }
     }
 }

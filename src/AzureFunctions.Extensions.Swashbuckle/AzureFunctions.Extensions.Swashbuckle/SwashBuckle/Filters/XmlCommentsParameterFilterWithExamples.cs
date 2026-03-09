@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -16,7 +16,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             this.xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
         }
 
-        public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
+        public void Apply(IOpenApiParameter parameter, ParameterFilterContext context)
         {
             if (context.PropertyInfo != null)
             {
@@ -28,7 +28,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             }
         }
 
-        private void ApplyPropertyTags(OpenApiParameter parameter, PropertyInfo propertyInfo)
+        private void ApplyPropertyTags(IOpenApiParameter parameter, PropertyInfo propertyInfo)
         {
             var propertyMemberName = XmlCommentsNodeNameHelper.GetMemberNameForFieldOrProperty(propertyInfo);
             var propertyNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{propertyMemberName}']");
@@ -43,15 +43,15 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             {
                 parameter.Description = XmlCommentsTextHelper.Humanize(summaryNode.InnerXml);
             }
-            
+
             var exampleNode = propertyNode.SelectSingleNode("example");
-            if (exampleNode != null)
+            if (exampleNode != null && parameter is OpenApiParameter concreteParameter)
             {
-                parameter.Example = JsonMapper.CreateFromJson(exampleNode.InnerXml);
+                concreteParameter.Example = JsonMapper.CreateFromJson(exampleNode.InnerXml);
             }
         }
 
-        private void ApplyParamTags(OpenApiParameter parameter, ParameterInfo parameterInfo)
+        private void ApplyParamTags(IOpenApiParameter parameter, ParameterInfo parameterInfo)
         {
             if (!(parameterInfo.Member is MethodInfo methodInfo))
             {
@@ -77,9 +77,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 parameter.Description = XmlCommentsTextHelper.Humanize(paramNode.InnerXml);
 
                 var example = paramNode.GetAttribute("example", string.Empty);
-                if (!string.IsNullOrEmpty(example))
+                if (!string.IsNullOrEmpty(example) && parameter is OpenApiParameter concreteParameter)
                 {
-                    parameter.Example = JsonMapper.CreateFromJson(example);
+                    concreteParameter.Example = JsonMapper.CreateFromJson(example);
                 }
             }
         }

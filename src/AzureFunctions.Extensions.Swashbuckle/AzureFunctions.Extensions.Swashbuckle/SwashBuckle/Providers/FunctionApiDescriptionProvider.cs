@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -317,7 +318,8 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
                     parameter.GetCustomAttribute(typeof(RequestBodyTypeAttribute)) as RequestBodyTypeAttribute;
 
                 if ((parameter.ParameterType == typeof(HttpRequestMessage) ||
-                     parameter.ParameterType == typeof(HttpRequest))
+                     parameter.ParameterType == typeof(HttpRequest) ||
+                     parameter.ParameterType == typeof(HttpRequestData))
                     && requestBodyTypeAttribute == null)
                 {
                     continue;
@@ -378,6 +380,11 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Providers
             }
 
             if (parameter.ParameterType == typeof(ExecutionContext))
+            {
+                return true;
+            }
+
+            if (parameter.ParameterType == typeof(FunctionContext))
             {
                 return true;
             }

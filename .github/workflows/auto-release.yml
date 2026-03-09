@@ -1,0 +1,147 @@
+name: Auto-Release & Publish NuGet
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.csproj'
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  NuGetDirectory: ${{github.workspace}}/nupkgs
+  CSPROJ_PATH: src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.csproj
+
+jobs:
+  detect-version:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.version-check.outputs.changed }}
+      current_version: ${{ steps.version-check.outputs.current_version }}
+      previous_version: ${{ steps.version-check.outputs.previous_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect version change
+        id: version-check
+        run: |
+          CURRENT_VERSION=$(grep -oP '(?<=<Version>)[^<]*' ${{ env.CSPROJ_PATH }})
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+
+          PREVIOUS_VERSION=$(git show HEAD~1:${{ env.CSPROJ_PATH }} 2>/dev/null | grep -oP '(?<=<Version>)[^<]*' || echo "")
+          echo "previous_version=$PREVIOUS_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Manual dispatch: forcing publish of $CURRENT_VERSION"
+          elif [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ] && [ -n "$PREVIOUS_VERSION" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Version changed: $PREVIOUS_VERSION -> $CURRENT_VERSION"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No version change detected"
+          fi
+
+  create-release:
+    needs: detect-version
+    if: needs.detect-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        run: |
+          VERSION="${{ needs.detect-version.outputs.current_version }}"
+          PREV="${{ needs.detect-version.outputs.previous_version }}"
+          TAG="v$VERSION"
+
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists, skipping"
+            exit 0
+          fi
+
+          gh release create "$TAG" \
+            --title "v$VERSION" \
+            --notes "## Changes
+
+          - Updated to Swashbuckle.AspNetCore 10.x / Microsoft.OpenApi v2
+          - Version bumped from $PREV to $VERSION
+
+          Published automatically to [NuGet](https://www.nuget.org/packages/AzureExtensions.Swashbuckle/$VERSION)." \
+            --target master
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-publish:
+    needs: [detect-version, create-release]
+    if: needs.detect-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build and Pack
+        run: |
+          VERSION="${{ needs.detect-version.outputs.current_version }}"
+          echo "Building and packing version: $VERSION"
+
+          dotnet build ${{ env.CSPROJ_PATH }} --configuration Release
+          dotnet pack ${{ env.CSPROJ_PATH }} --configuration Release \
+            --output ${{ env.NuGetDirectory }} \
+            /p:Version=$VERSION
+
+      - name: Validate NuGet package
+        run: |
+          dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
+          meziantou.validate-nuget-package $(ls "${{ env.NuGetDirectory }}"/*.nupkg) --excluded-rules Symbols
+
+      - name: Publish to NuGet.org
+        run: |
+          for file in $(find ${{ env.NuGetDirectory }} -name "*.nupkg" ! -name "*.snupkg"); do
+            dotnet nuget push "$file" \
+              --api-key "${{ secrets.NUGET_PUSH_KEY }}" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+          for file in $(find ${{ env.NuGetDirectory }} -name "*.snupkg"); do
+            dotnet nuget push "$file" \
+              --api-key "${{ secrets.NUGET_PUSH_KEY }}" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+
+      - name: Publish to GitHub Packages
+        run: |
+          dotnet nuget add source \
+            --username ${{ github.repository_owner }} \
+            --password ${{ secrets.GITHUB_TOKEN }} \
+            --store-password-in-clear-text \
+            --name github \
+            "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+          for file in $(find ${{ env.NuGetDirectory }} -name "*.nupkg" ! -name "*.snupkg"); do
+            dotnet nuget push "$file" \
+              --api-key ${{ secrets.GITHUB_TOKEN }} \
+              --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/" \
+              --skip-duplicate
+          done
+          for file in $(find ${{ env.NuGetDirectory }} -name "*.snupkg"); do
+            dotnet nuget push "$file" \
+              --api-key ${{ secrets.GITHUB_TOKEN }} \
+              --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/" \
+              --skip-duplicate
+          done

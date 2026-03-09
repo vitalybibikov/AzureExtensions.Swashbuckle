@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TestFunction.CustomFilterExample
@@ -9,9 +9,10 @@ namespace TestFunction.CustomFilterExample
     {
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            foreach (var item in swaggerDoc.Components.Schemas)
+            var keysToRemove = new List<string>(swaggerDoc.Components.Schemas.Keys);
+            foreach (var key in keysToRemove)
             {
-                swaggerDoc.Components.Schemas.Remove(item.Key);
+                swaggerDoc.Components.Schemas.Remove(key);
             }
         }
     }

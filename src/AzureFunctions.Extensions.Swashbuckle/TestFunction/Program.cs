@@ -5,7 +5,6 @@ using System.Reflection;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 using AzureFunctions.Extensions.Swashbuckle;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
