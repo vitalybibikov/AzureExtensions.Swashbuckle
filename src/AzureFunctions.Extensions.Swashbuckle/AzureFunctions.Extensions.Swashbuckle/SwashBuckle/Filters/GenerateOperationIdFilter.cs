@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters

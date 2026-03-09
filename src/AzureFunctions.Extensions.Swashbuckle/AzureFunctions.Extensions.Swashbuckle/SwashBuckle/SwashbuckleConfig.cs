@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -74,16 +72,21 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                     throw new ArgumentNullException(nameof(binPath), "Not found path to an xml directory");
                 }
 
-                var binDirectory = Directory.CreateDirectory(binPath);
-                var xmlBasePath = binDirectory?.Parent?.FullName;
-
-                if (xmlBasePath != null)
+                // Search for XML file in multiple locations:
+                // 1. Same directory as the assembly (e.g., bin/Debug/net8.0/)
+                // 2. Parent directory (e.g., bin/Debug/) for backward compatibility
+                var candidatePaths = new[]
                 {
-                    var path = Path.Combine(xmlBasePath, this.swaggerOptions.XmlPath);
+                    Path.Combine(binPath, this.swaggerOptions.XmlPath),
+                    Path.Combine(Directory.CreateDirectory(binPath).Parent?.FullName ?? binPath, this.swaggerOptions.XmlPath)
+                };
 
-                    if (File.Exists(path))
+                foreach (var candidatePath in candidatePaths)
+                {
+                    if (File.Exists(candidatePath))
                     {
-                        this.xmlPath = path;
+                        this.xmlPath = candidatePath;
+                        break;
                     }
                 }
             }
@@ -177,18 +180,18 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 .Replace("{usePkceWithAuthorizationCodeGrant}", this.swaggerOptions.UsePkceWithAuthorizationCodeGrant ? "true" : "false");
         }
 
-        public Stream GetSwaggerJsonDocument(string host, string documentName = "v1")
+        public async Task<Stream> GetSwaggerJsonDocumentAsync(string host, string documentName = "v1")
         {
             var swaggerProvider = this.serviceProvider!.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return this.SerializeJsonDocument(document);
+            return await this.SerializeJsonDocumentAsync(document);
         }
 
-        public Stream GetSwaggerYamlDocument(string host, string documentName = "v1")
+        public async Task<Stream> GetSwaggerYamlDocumentAsync(string host, string documentName = "v1")
         {
             var swaggerProvider = this.serviceProvider!.GetRequiredService<ISwaggerProvider>();
             var document = swaggerProvider.GetSwagger(documentName, host, string.Empty);
-            return this.SerializeYamlDocument(document);
+            return await this.SerializeYamlDocumentAsync(document);
         }
 
         private static void AddSwaggerDocument(SwaggerGenOptions options, SwaggerDocument document)
@@ -200,6 +203,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
                 Description = document.Description
             });
         }
+
         private static Assembly GetAssembly()
         {
             var assembly = Assembly.GetAssembly(typeof(SwashBuckleClient));
@@ -230,23 +234,31 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle
             return documentHtml;
         }
 
-        private MemoryStream SerializeJsonDocument(OpenApiDocument document)
+        private async Task<MemoryStream> SerializeJsonDocumentAsync(OpenApiDocument document)
         {
             var memoryStream = new MemoryStream();
-            document.SerializeAsJson(
-                memoryStream,
-                this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? OpenApiSpecVersion.OpenApi2_0 : OpenApiSpecVersion.OpenApi3_0);
+            var specVersion = this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0
+                ? OpenApiSpecVersion.OpenApi2_0
+                : OpenApiSpecVersion.OpenApi3_0;
+
+            var writer = new OpenApiJsonWriter(new StreamWriter(memoryStream));
+            await document.SerializeAsync(writer, specVersion);
+            await writer.FlushAsync();
 
             memoryStream.Position = 0;
             return memoryStream;
         }
 
-        private MemoryStream SerializeYamlDocument(OpenApiDocument document)
+        private async Task<MemoryStream> SerializeYamlDocumentAsync(OpenApiDocument document)
         {
             var memoryStream = new MemoryStream();
-            document.SerializeAsYaml(
-                memoryStream,
-                this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0 ? OpenApiSpecVersion.OpenApi2_0 : OpenApiSpecVersion.OpenApi3_0);
+            var specVersion = this.swaggerOptions.SpecVersion == OpenApiSpecVersion.OpenApi2_0
+                ? OpenApiSpecVersion.OpenApi2_0
+                : OpenApiSpecVersion.OpenApi3_0;
+
+            var writer = new OpenApiYamlWriter(new StreamWriter(memoryStream));
+            await document.SerializeAsync(writer, specVersion);
+            await writer.FlushAsync();
 
             memoryStream.Position = 0;
             return memoryStream;

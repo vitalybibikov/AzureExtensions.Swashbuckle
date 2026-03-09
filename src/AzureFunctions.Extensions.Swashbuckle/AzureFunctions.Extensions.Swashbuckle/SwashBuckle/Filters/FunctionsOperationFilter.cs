@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -9,10 +9,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            operation.Parameters ??= new List<OpenApiParameter>
-            {
-                Capacity = 4
-            };
+            operation.Parameters ??= new List<IOpenApiParameter>();
 
             foreach (var customAttribute in context.MethodInfo.GetCustomAttributes(typeof(RequestHttpHeaderAttribute), false))
             {
@@ -20,7 +17,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 {
                     Name = (customAttribute as RequestHttpHeaderAttribute)!.HeaderName,
                     In = ParameterLocation.Header,
-                    Schema = new OpenApiSchema { Type = "string" },
+                    Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                     Required = (customAttribute as RequestHttpHeaderAttribute)!.IsRequired
                 });
             }
@@ -32,7 +29,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 {
                     Name = (customAttribute as RequestHttpHeaderAttribute)!.HeaderName,
                     In = ParameterLocation.Header,
-                    Schema = new OpenApiSchema { Type = "string" },
+                    Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                     Required = (customAttribute as RequestHttpHeaderAttribute)!.IsRequired
                 });
             }

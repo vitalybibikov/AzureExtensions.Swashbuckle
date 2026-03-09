@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -27,14 +27,21 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                 }
 
                 var uploadFile = swaggerUploadFiles.First();
-                operation.RequestBody ??= new OpenApiRequestBody();
 
-                if (!operation.RequestBody.Content.ContainsKey(MimeType))
+                if (operation.RequestBody is not OpenApiRequestBody requestBodyRef)
                 {
-                    operation.RequestBody.Content[MimeType] = new OpenApiMediaType();
+                    requestBodyRef = new OpenApiRequestBody();
+                    operation.RequestBody = requestBodyRef;
                 }
 
-                operation.RequestBody.Content[MimeType].Schema ??= new OpenApiSchema();
+                requestBodyRef.Content ??= new Dictionary<string, OpenApiMediaType>();
+
+                if (!requestBodyRef.Content.ContainsKey(MimeType))
+                {
+                    requestBodyRef.Content[MimeType] = new OpenApiMediaType();
+                }
+
+                requestBodyRef.Content[MimeType].Schema ??= new OpenApiSchema();
 
                 var uploadFileName = string.IsNullOrEmpty(uploadFile.Name)
                     ? "uploadedFile"
@@ -44,40 +51,34 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
                     ? "File to upload."
                     : uploadFile.Description;
 
+                var fileSchema = new OpenApiSchema
+                {
+                    Type = JsonSchemaType.Object,
+                    Required = new HashSet<string> { uploadFileName }
+                };
+
+                fileSchema.Properties ??= new Dictionary<string, IOpenApiSchema>();
+                fileSchema.Properties[uploadFileName] = new OpenApiSchema
+                {
+                    Description = uploadFileDescription,
+                    Type = JsonSchemaType.String,
+                    Format = "binary"
+                };
+
                 var uploadFileMediaType = new OpenApiMediaType
                 {
-                    Schema = new OpenApiSchema
-                    {
-                        Type = "object",
-                        Properties =
-                        {
-                            [uploadFileName] = new OpenApiSchema
-                            {
-                                Description = uploadFileDescription,
-                                Type = "file",
-                                Format = "binary"
-                            }
-                        },
-                        Required = new HashSet<string>
-                        {
-                            uploadFileName
-                        }
-                    }
+                    Schema = fileSchema
                 };
 
-                operation.RequestBody = new OpenApiRequestBody
-                {
-                    Content =
-                    {
-                        [MimeType] = uploadFileMediaType
-                    }
-                };
+                var newRequestBody = new OpenApiRequestBody();
+                newRequestBody.Content ??= new Dictionary<string, OpenApiMediaType>();
+                newRequestBody.Content[MimeType] = uploadFileMediaType;
+                operation.RequestBody = newRequestBody;
 
-                if (!string.IsNullOrEmpty(uploadFile.Example))
+                if (!string.IsNullOrEmpty(uploadFile.Example) && fileSchema is OpenApiSchema concreteSchema)
                 {
-                    operation.RequestBody.Content[MimeType].Schema.Example =
-                        new OpenApiString(uploadFile.Example);
-                    operation.RequestBody.Content[MimeType].Schema.Description = uploadFile.Example;
+                    concreteSchema.Example = JsonValue.Create(uploadFile.Example);
+                    concreteSchema.Description = uploadFile.Example;
                 }
             }
         }

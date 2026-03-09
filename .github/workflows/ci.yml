@@ -1,0 +1,100 @@
+name: CI
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  SOLUTION_PATH: src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.sln
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['8.0.x', '9.0.x']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build (Debug)
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Debug --no-restore
+
+      - name: Build (Release)
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      - name: Run tests
+        run: |
+          dotnet test ${{ env.SOLUTION_PATH }} \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./test-results
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.dotnet-version }}
+          path: ./test-results/*.trx
+          retention-days: 30
+
+      - name: Process test results
+        if: always() && github.event_name == 'pull_request'
+        uses: im-open/process-dotnet-test-results@v3.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-directory: './test-results'
+          create-status-check: true
+          create-pr-comment: true
+          update-comment-if-one-exists: true
+          ignore-test-failures: false
+          comment-identifier: 'swashbuckle-tests-${{ matrix.dotnet-version }}'
+
+  pack:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Pack NuGet
+        run: |
+          dotnet pack src/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle/AzureFunctions.Extensions.Swashbuckle.csproj \
+            --configuration Release \
+            --output ./nupkgs
+
+      - name: Validate NuGet package
+        run: |
+          dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
+          meziantou.validate-nuget-package $(ls ./nupkgs/*.nupkg) --excluded-rules Symbols
+
+      - name: Upload NuGet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          if-no-files-found: error
+          retention-days: 7
+          path: ./nupkgs/*

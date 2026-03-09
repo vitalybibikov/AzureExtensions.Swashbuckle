@@ -1,5 +1,5 @@
-using Microsoft.OpenApi.Any;
 using System;
+using System.Text.Json.Nodes;
 
 namespace AzureFunctions.Extensions.Swashbuckle.Attribute
 {
@@ -9,55 +9,55 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         public QueryStringParameterAttribute(string name, string description)
         {
             this.Initialize(name, description);
-            this.Example = new OpenApiNull();
+            this.Example = null;
         }
 
         public QueryStringParameterAttribute(string name, string description, string example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(string);
-            this.Example = new OpenApiString(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, int example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(int);
-            this.Example = new OpenApiInteger(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, long example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(long);
-            this.Example = new OpenApiLong(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, double example)
         {
             this.Initialize(name, description);
-            this.Example = new OpenApiDouble(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, float example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(float);
-            this.Example = new OpenApiFloat(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, byte example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(byte);
-            this.Example = new OpenApiByte(example);
+            this.Example = JsonValue.Create(example);
         }
 
         public QueryStringParameterAttribute(string name, string description, bool example)
         {
             this.Initialize(name, description);
             this.DataType = typeof(bool);
-            this.Example = new OpenApiBoolean(example);
+            this.Example = JsonValue.Create(example);
         }
 
         private void Initialize(string name, string description)
@@ -70,7 +70,6 @@ namespace AzureFunctions.Extensions.Swashbuckle.Attribute
         public Type DataType { get; set; }
         public string Description { get; set; }
         public bool Required { get; set; } = false;
-        public IOpenApiAny Example { get; }
+        public JsonNode? Example { get; }
     }
 }
-

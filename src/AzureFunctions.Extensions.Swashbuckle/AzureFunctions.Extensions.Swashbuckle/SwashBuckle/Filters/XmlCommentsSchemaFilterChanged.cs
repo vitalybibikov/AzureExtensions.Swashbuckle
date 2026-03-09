@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Xml.XPath;
 using AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters.Mapper;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
@@ -16,7 +16,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             this.xmlNavigator = xmlDoc.CreateNavigator() ?? throw new ArgumentException();
         }
 
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             this.ApplyTypeTags(schema, context.Type);
 
@@ -26,7 +26,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             }
         }
 
-        private void ApplyTypeTags(OpenApiSchema schema, Type type)
+        private void ApplyTypeTags(IOpenApiSchema schema, Type type)
         {
             var typeMemberName = XmlCommentsNodeNameHelper.GetMemberNameForType(type);
             var typeSummaryNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{typeMemberName}']/summary");
@@ -37,7 +37,7 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             }
         }
 
-        private void ApplyFieldOrPropertyTags(OpenApiSchema schema, MemberInfo fieldOrPropertyInfo)
+        private void ApplyFieldOrPropertyTags(IOpenApiSchema schema, MemberInfo fieldOrPropertyInfo)
         {
             var fieldOrPropertyMemberName = XmlCommentsNodeNameHelper.GetMemberNameForFieldOrProperty(fieldOrPropertyInfo);
             var fieldOrPropertyNode = this.xmlNavigator.SelectSingleNode($"/doc/members/member[@name='{fieldOrPropertyMemberName}']");
@@ -54,9 +54,9 @@ namespace AzureFunctions.Extensions.Swashbuckle.SwashBuckle.Filters
             }
 
             var exampleNode = fieldOrPropertyNode.SelectSingleNode("example");
-            if (exampleNode != null)
+            if (exampleNode != null && schema is OpenApiSchema concreteSchema)
             {
-                schema.Example = JsonMapper.CreateFromJson(exampleNode.InnerXml);
+                concreteSchema.Example = JsonMapper.CreateFromJson(exampleNode.InnerXml);
             }
         }
     }
