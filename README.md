@@ -26,13 +26,18 @@ Swagger and Swagger UI for **Azure Functions** (isolated worker model) powered b
 
 ---
 
+## What's New in v5.0.5
+
+- **Fixed** `ConfigureFunctionsWebApplication` compatibility — removed `AddMvcCore()` which registered the full MVC routing pipeline, conflicting with Azure Functions HTTP routing and causing requests to hang
+- **New** Integration test CI workflow — validates all Swagger endpoints on both Linux and Windows via `func start`
+- Cleaned up TestFunction SwaggerController (removed diagnostic logging)
+
 ## What's New in v5.0.4
 
 - **New** `IActionResult`-based extension methods for `ConfigureFunctionsWebApplication`
   - `CreateSwaggerJsonDocumentResult`, `CreateSwaggerYamlDocumentResult`, `CreateSwaggerUIResult`, `CreateSwaggerOAuth2RedirectResult`
   - Uses `ContentResult` — no `HttpResponseData` pipeline issues
 - **New** `SwaggerValidate` self-test endpoint in TestFunction
-- Fixed response hanging with `ConfigureFunctionsWebApplication` (ASP.NET Core integration)
 - Fixed startup crash (`0x80008096`) caused by missing MVC core service registrations
 - Added test fakes (`FakeHttpRequestData`, `FakeHttpResponseData`) for extension method testing
 - Added 55 new tests: 25 `HttpResponseData` extension + 16 `IActionResult` extension + 14 DI functional (191 total)
@@ -81,6 +86,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 
 var host = new HostBuilder()
+    .ConfigureFunctionsWebApplication()
     .ConfigureServices((hostContext, services) =>
     {
         services.AddSwashBuckle(opts =>
@@ -107,6 +113,8 @@ var host = new HostBuilder()
 
 host.Run();
 ```
+
+> **Note:** `AddSwashBuckle` is fully compatible with `ConfigureFunctionsWebApplication` (ASP.NET Core integration). It does **not** register `AddMvcCore()` — only the minimal services needed for API description, so it won't interfere with Azure Functions HTTP routing.
 
 ### 2. Add Swagger Endpoints
 
