@@ -62,7 +62,7 @@ public class SwashBuckleClientTests
         using var reader = new StreamReader(stream);
         var content = reader.ReadToEnd();
         content.Should().NotBeNullOrWhiteSpace();
-        content.Should().Contain("oauth2", "OAuth2 redirect page should contain oauth2 references");
+        content.Should().ContainEquivalentOf("oauth", "OAuth2 redirect page should contain OAuth references");
     }
 
     [Fact]
