@@ -1,10 +1,6 @@
 using Microsoft.Azure.Functions.Worker.Http;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AzureFunctions.Extensions.Swashbuckle
 {
@@ -23,7 +19,7 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
+            await response.WriteStringAsync(document);
 
             return response;
         }
@@ -37,12 +33,11 @@ namespace AzureFunctions.Extensions.Swashbuckle
 
             using var stream = await client.GetSwaggerYamlDocumentAsync(host, documentName);
             using var reader = new StreamReader(stream);
+            var document = await reader.ReadToEndAsync();
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "application/x-yaml; charset=utf-8");
-
-            var document = await reader.ReadToEndAsync();
-            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
+            await response.WriteStringAsync(document);
 
             return response;
         }
@@ -57,13 +52,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
                 : $"/{client.RoutePrefix}";
 
             var host = GetBaseUri(requestData);
-            var stream = client.GetSwaggerUi($"{host}{routePrefix}/{documentRoute}");
+            using var stream = client.GetSwaggerUi($"{host}{routePrefix}/{documentRoute}");
+            using var reader = new StreamReader(stream);
+            var document = await reader.ReadToEndAsync();
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-            using var reader = new StreamReader(stream);
-            var document = await reader.ReadToEndAsync();
-            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
+            await response.WriteStringAsync(document);
             return response;
         }
 
@@ -71,13 +66,13 @@ namespace AzureFunctions.Extensions.Swashbuckle
             this ISwashBuckleClient client,
             HttpRequestData requestData)
         {
-            var stream = client.GetSwaggerOAuth2Redirect();
+            using var stream = client.GetSwaggerOAuth2Redirect();
+            using var reader = new StreamReader(stream);
+            var document = await reader.ReadToEndAsync();
 
             var response = requestData.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-            using var reader = new StreamReader(stream);
-            var document = await reader.ReadToEndAsync();
-            await response.WriteStringAsync(document, CancellationToken.None, Encoding.UTF8);
+            await response.WriteStringAsync(document);
             return response;
         }
 

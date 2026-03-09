@@ -26,6 +26,12 @@ Swagger and Swagger UI for **Azure Functions** (isolated worker model) powered b
 
 ---
 
+## What's New in v5.0.3
+
+- Fixed `WriteStringAsync` parameter order in all response extension methods causing responses to hang
+- Fixed undisposed streams in `CreateSwaggerUIResponse` and `CreateSwaggerOAuth2RedirectResponse`
+- Simplified response creation — removed unnecessary `Encoding` and `CancellationToken` overrides
+
 ## What's New in v5.0.2
 
 - Fixed startup crash (`0x80008096`) caused by missing MVC core service registrations
