@@ -109,7 +109,7 @@ jobs:
       - name: Validate NuGet package
         run: |
           dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
-          meziantou.validate-nuget-package $(ls "${{ env.NuGetDirectory }}"/*.nupkg) --excluded-rules Symbols IconMustBeSet
+          meziantou.validate-nuget-package $(ls "${{ env.NuGetDirectory }}"/*.nupkg) --excluded-rules Symbols --excluded-rules IconMustBeSet
 
       - name: Publish to NuGet.org
         run: |

@@ -96,7 +96,7 @@ jobs:
       - name: Validate NuGet package
         run: |
           dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
-          meziantou.validate-nuget-package $(ls ./nupkgs/*.nupkg) --excluded-rules Symbols IconMustBeSet
+          meziantou.validate-nuget-package $(ls ./nupkgs/*.nupkg) --excluded-rules Symbols --excluded-rules IconMustBeSet
 
       - name: Upload NuGet artifact
         uses: actions/upload-artifact@v4
